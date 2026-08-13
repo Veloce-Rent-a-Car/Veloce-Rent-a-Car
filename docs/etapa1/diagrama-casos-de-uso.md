@@ -21,20 +21,22 @@
 
 ## Diagrama Mermaid
 
-```mermaid
-usecaseDiagram
-    actor "Cliente" as C
-    actor "Administrador" as A
+> Mermaid não possui um tipo nativo de "diagrama de caso de uso" (isso é específico do PlantUML). A representação abaixo usa `flowchart`, que é suportado nativamente pelo GitHub, simulando atores (retângulos) conectados a casos de uso (formato de estádio/elipse).
 
-    package "CarRental API" {
-        usecase "Cadastrar Cliente" as UC01
-        usecase "Consultar Cliente" as UC02
-        usecase "Cadastrar Carro" as UC03
-        usecase "Consultar Carros\nDisponíveis" as UC04
-        usecase "Realizar Aluguel" as UC05
-        usecase "Finalizar Aluguel" as UC06
-        usecase "Consultar Histórico\nde Aluguéis" as UC07
-    }
+```mermaid
+flowchart LR
+    C(["👤 Cliente"])
+    A(["🛠️ Administrador"])
+
+    subgraph SIS["CarRental API"]
+        UC01(["Cadastrar Cliente"])
+        UC02(["Consultar Cliente"])
+        UC03(["Cadastrar Carro"])
+        UC04(["Consultar Carros Disponíveis"])
+        UC05(["Realizar Aluguel"])
+        UC06(["Finalizar Aluguel"])
+        UC07(["Consultar Histórico de Aluguéis"])
+    end
 
     C --> UC04
     C --> UC05
@@ -48,8 +50,8 @@ usecaseDiagram
     A --> UC06
     A --> UC07
 
-    UC05 ..> UC04 : <<inclui>>
-    UC06 ..> UC03 : <<atualiza status>>
+    UC05 -.->|inclui| UC04
+    UC06 -.->|atualiza status| UC03
 ```
 
 > **Nota:** O caso de uso *Realizar Aluguel* inclui a verificação de disponibilidade do carro (UC04), e o caso *Finalizar Aluguel* atualiza o status do veículo para disponível (relação com UC03).
