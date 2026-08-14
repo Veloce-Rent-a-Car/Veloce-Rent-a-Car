@@ -11,3 +11,7 @@ O objetivo principal deste projeto é aplicar na prática os conceitos de engenh
 ## 3. Justificativa
 
 Sistemas de locação de veículos são amplamente utilizados no mercado, desde grandes redes internacionais até pequenas locadoras regionais. Desenvolver uma versão simplificada de tal sistema permite ao aluno lidar com desafios reais de desenvolvimento de software — modelagem de domínio, persistência de dados, validação de regras de negócio e comunicação via API — sem a complexidade adicional de integrações com sistemas externos de pagamento ou gateway financeiro. Dessa forma, o projeto equilibra a aplicação prática de conceitos acadêmicos com a relevância de um problema do mundo real.
+
+## 4. Atribuição da equipe
+
+- **Alexandre-MCS**: desenvolvedor iniciante com atribuição de apoio no desenvolvimento das funcionalidades e na documentação do projeto.
