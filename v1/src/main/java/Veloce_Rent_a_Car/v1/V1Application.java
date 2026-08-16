@@ -1,13 +1,17 @@
 package Veloce_Rent_a_Car.v1;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import Veloce_Rent_a_Car.models.Cliente;
+
 
 @SpringBootApplication
 public class V1Application {
 
 	public static void main(String[] args) {
 		SpringApplication.run(V1Application.class, args);
+
+		Cliente cliente = new Cliente();
 	}
 
 }
