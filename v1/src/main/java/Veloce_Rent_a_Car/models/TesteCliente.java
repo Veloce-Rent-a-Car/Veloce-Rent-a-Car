@@ -6,16 +6,20 @@ public class TesteCliente {
 
     public static void main(String[] args) {
 
-        String cpf = "10428298451";
-        String email = "cliente@example.com";
+       Cliente cliente = new Cliente();
+        cliente.nome = "Ronaldo";
+        cliente.cpf = "10428298451";
+        cliente.telefone = "81999999999";
+        cliente.email = "cliente@example.com";
+        cliente.endereco = "Recife";
 
-        if (cpf.length() == 11) {
+        if (cliente.cpf.length() == 11) {
             System.out.println("CPF valido.");
         } else {
             System.out.println("CPF invalido.");
         }
 
-        if (email.contains("@")) {
+        if (cliente.email.contains("@")) {
             System.out.println("Email valido.");
         } else {
             System.out.println("Email invalido.");
