@@ -18,7 +18,7 @@ Sistema back-end que gerencia clientes, veículos, locações (aluguéis) e paga
 | **Rossini (Roberto Rossini)** | Dev responsável pela parte "pesada": arquitetura, regras de negócio, entidade central de Aluguel, integrações entre módulos |
 | **Ronaldo Malta** | Dev iniciante em Java — CRUD de entidade simples (Cliente) |
 | **Pedro Vieira** | Dev iniciante em Java — CRUD de entidade simples (Carro) |
-| **Alexandre** | Dev iniciante em Java, bem aplicado — Módulo de Pagamento e regras de transação |
+| **Alexandre** | Dev iniciante em Java — Módulo de Pagamento e regras de transação |
 
 ## 🧩 Divisão de tarefas
 
