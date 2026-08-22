@@ -30,11 +30,16 @@ Sistema back-end que gerencia clientes, veículos, locações (aluguéis) e paga
 - Configuração inicial do projeto (estrutura de pacotes, `application.properties`, conexão com o banco)
 - Documentação da API (Swagger/OpenAPI)
 
-### 🟢 Ronaldo — Módulo de Cliente
-- Entidade `Cliente` (nome, CPF, telefone, email, endereço)
-- CRUD completo (`ClienteController`, `ClienteService`, `ClienteRepository`)
-- Validações básicas de campos (CPF, email)
-- Testes manuais via Postman/Insomnia
+### 🟢 Ronaldo — Módulo de Cliente, Front-end e DevOps
+
+* Entidade `Cliente` (nome, CPF, telefone, email, endereço)
+* CRUD completo (`ClienteController`, `ClienteService`, `ClienteRepository`)
+* Validações básicas de campos (CPF, email)
+* Testes manuais via Postman/Insomnia
+* Desenvolvimento e integração do front-end da aplicação
+* Configuração e organização das rotas da aplicação
+* Criação da pipeline CI/CD do projeto
+* Automação de build e testes utilizando GitHub Actions
 
 ### 🟡 Pedro — Módulo de Carro
 - Entidade `Carro` (modelo, placa, categoria, valor da diária, status de disponibilidade)
