@@ -17,3 +17,4 @@ out/
 .project
 .classpath
 .DS_Store
+graphify-out/
