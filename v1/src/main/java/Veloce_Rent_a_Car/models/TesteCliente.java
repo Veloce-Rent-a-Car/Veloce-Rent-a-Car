@@ -4,7 +4,7 @@ public class TesteCliente {
 
     public static void main(String[] args) {
 
-        Cliente cliente = new Cliente();
+        Client cliente = new Client();
 
         cliente.setNome("Ronaldo");
         cliente.setCpf("10428298451");

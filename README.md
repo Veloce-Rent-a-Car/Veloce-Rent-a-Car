@@ -32,7 +32,7 @@ Sistema back-end que gerencia clientes, veículos, locações (aluguéis) e paga
 
 ### 🟢 Ronaldo — Módulo de Cliente, Front-end e DevOps
 
-* Entidade `Cliente` (nome, CPF, telefone, email, endereço)
+* Entidade `Client` (nome, CPF, telefone, email, endereço)
 * CRUD completo (`ClienteController`, `ClienteService`, `ClienteRepository`)
 * Validações básicas de campos (CPF, email)
 * Testes manuais via Postman/Insomnia

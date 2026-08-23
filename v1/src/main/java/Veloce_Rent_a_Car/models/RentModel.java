@@ -1,23 +1,26 @@
 package Veloce_Rent_a_Car.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Generated;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewRentModel {
+public class RentModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+
+    @ManyToOne
+    @JoinColumn(name="UserName")
+    private String username;
+
+    @ManyToOne
+    @JoinColumn(name="cpf")
     private String cpf;
+
     private String CarName;
     private String CarModelType;
     private float RentValue;
