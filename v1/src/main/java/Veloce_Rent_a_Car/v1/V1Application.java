@@ -3,7 +3,7 @@ package Veloce_Rent_a_Car.v1;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import Veloce_Rent_a_Car.models.Cliente;
+import Veloce_Rent_a_Car.models.Client;
 
 @SpringBootApplication
 public class V1Application {
@@ -12,7 +12,7 @@ public class V1Application {
 
         SpringApplication.run(V1Application.class, args);
 
-        Cliente cliente = new Cliente();
+        Client cliente = new Client();
 
         cliente.setNome("Ronaldo");
         cliente.setCpf("10428298451");
