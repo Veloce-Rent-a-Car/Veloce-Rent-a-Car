@@ -2,18 +2,18 @@ package Veloce_Rent_a_Car.models;
 
 public class Client {
 
-    private String nome;
+    private String name;
     private String cpf;
-    private String telefone;
+    private String phone;
     private String email;
-    private String endereco;
+    private String address;
 
-    public String getNome() {
-        return nome;
+    public String getName() {
+        return name;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getCpf() {
@@ -24,12 +24,12 @@ public class Client {
         this.cpf = cpf;
     }
 
-    public String getTelefone() {
-        return telefone;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getEmail() {
@@ -40,11 +40,11 @@ public class Client {
         this.email = email;
     }
 
-    public String getEndereco() {
-        return endereco;
+    public String getAddress() {
+        return address;
     }
 
-    public void setEndereco(String endereco) {
-        this.endereco = endereco;
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
