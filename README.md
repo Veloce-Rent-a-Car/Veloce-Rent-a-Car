@@ -47,7 +47,7 @@ Sistema back-end que gerencia clientes, veículos, locações (aluguéis) e paga
 - Endpoint para listar apenas carros disponíveis
 - Testes manuais via Postman/Insomnia
 
-### 🔵 Alexandre (Xande) — Módulo de Pagamento
+### 🔵 Alexandre — Módulo de Pagamento
 - Modelagem da entidade `Pagamento` (vinculada ao `Aluguel`, com campos como `valorPago`, `dataPagamento`, `metodoPagamento` e `status`)
 - Criação de **Enums** para simplificar o domínio: `MetodoPagamento` (PIX, CARTAO_CREDITO) e `StatusPagamento` (PENDENTE, APROVADO, RECUSADO)
 - Camadas completas de processamento (`PagamentoController`, `PagamentoService`, `PagamentoRepository`)
