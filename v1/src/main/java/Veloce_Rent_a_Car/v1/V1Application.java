@@ -2,7 +2,8 @@ package Veloce_Rent_a_Car.v1;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import Veloce_Rent_a_Car.models.Cliente;
+
+import Veloce_Rent_a_Car.models.Client;
 import Veloce_Rent_a_Car.models.Carro;
 
 @SpringBootApplication
@@ -11,23 +12,23 @@ public class V1Application {
     public static void main(String[] args) {
         SpringApplication.run(V1Application.class, args);
 
-        Cliente cliente = new Cliente();
+        Client cliente = new Client();
 
-        cliente.nome = "Ronaldo";
-        cliente.cpf = "10428298451";
-        cliente.telefone = "81999999999";
-        cliente.email = "cliente@example.com";
-        cliente.endereco = "Recife";
+        cliente.setName("Ronaldo");
+        cliente.setCpf("10428298451");
+        cliente.setPhone("81999999999");
+        cliente.setEmail("cliente@example.com");
+        cliente.setAddress("Recife");
 
-        if(cliente.cpf.length() == 11){
+        if (cliente.getCpf().length() == 11) {
             System.out.println("CPF valido.");
-        }else{
+        } else {
             System.out.println("CPF invalido.");
         }
 
-        if(cliente.email.contains("@")){
+        if (cliente.getEmail().contains("@")) {
             System.out.println("Email valido.");
-        }else{
+        } else {
             System.out.println("Email invalido.");
         }
 
