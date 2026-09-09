@@ -3,8 +3,8 @@ package Veloce_Rent_a_Car.v1;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import Veloce_Rent_a_Car.models.Client;
 import Veloce_Rent_a_Car.models.Carro;
+import Veloce_Rent_a_Car.models.Client;
 
 @SpringBootApplication
 public class V1Application {
@@ -12,25 +12,25 @@ public class V1Application {
     public static void main(String[] args) {
         SpringApplication.run(V1Application.class, args);
 
-        Client cliente = new Client();
+        Client client = new Client(
+            "Ronaldo",
+            "10428298451",
+            "81999999999",
+            "cliente@example.com",
+            "Recife"
+);
 
-        cliente.setName("Ronaldo");
-        cliente.setCpf("10428298451");
-        cliente.setPhone("81999999999");
-        cliente.setEmail("cliente@example.com");
-        cliente.setAddress("Recife");
+            if (client.getCpf().length() == 11) {
+                System.out.println("CPF valido.");
+            } else {
+                System.out.println("CPF invalido.");
+            }
 
-        if (cliente.getCpf().length() == 11) {
-            System.out.println("CPF valido.");
-        } else {
-            System.out.println("CPF invalido.");
-        }
-
-        if (cliente.getEmail().contains("@")) {
-            System.out.println("Email valido.");
-        } else {
-            System.out.println("Email invalido.");
-        }
+            if (client.getEmail().contains("@")) {
+                System.out.println("Email valido.");
+            } else {
+                System.out.println("Email invalido.");
+            }
 
         Carro carro = new Carro();
 
