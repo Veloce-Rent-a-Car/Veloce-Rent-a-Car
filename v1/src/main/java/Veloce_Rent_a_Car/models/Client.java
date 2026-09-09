@@ -8,6 +8,14 @@ public class Client {
     private String email;
     private String address;
 
+    public Client(String name, String cpf, String phone, String email, String address) {
+        this.name = name;
+        this.cpf = cpf;
+        this.phone = phone;
+        this.email = email;
+        this.address = address;
+    }
+
     public String getName() {
         return name;
     }
