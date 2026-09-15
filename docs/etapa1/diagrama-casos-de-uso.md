@@ -51,7 +51,6 @@ flowchart LR
     A --> UC07
 
     UC05 -.->|inclui| UC04
-    UC06 -.->|atualiza status| UC03
 ```
 
-> **Nota:** O caso de uso *Realizar Aluguel* inclui a verificação de disponibilidade do carro (UC04), e o caso *Finalizar Aluguel* atualiza o status do veículo para disponível (relação com UC03).
+> **Nota:** O caso de uso *Realizar Aluguel* inclui a verificação de disponibilidade do carro (UC04). O caso *Finalizar Aluguel* registra a devolução, calcula o valor total e atualiza o status do veículo para disponível, sem depender de *Cadastrar Carro*.
