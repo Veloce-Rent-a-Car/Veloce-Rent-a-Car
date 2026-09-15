@@ -3,7 +3,7 @@
 API REST para um sistema conceito de aluguel de carros, desenvolvida como projeto acadêmico.
 
 ## 📋 Sobre o projeto
-Sistema back-end que gerencia clientes, veículos, locações (aluguéis) e pagamentos, com regras de negócio para controle de disponibilidade, cálculo de valores, status de reserva e processamento de transações.
+Sistema back-end que gerencia clientes, veículos e locações (aluguéis), com regras de negócio para controle de disponibilidade, cálculo de valores, status de reserva e finalização do aluguel.
 
 ## 🛠️ Stack
 - **Java 17+**
@@ -18,7 +18,7 @@ Sistema back-end que gerencia clientes, veículos, locações (aluguéis) e paga
 | **Rossini (Roberto Rossini)** | Dev responsável pela parte "pesada": arquitetura, regras de negócio, entidade central de Aluguel, integrações entre módulos |
 | **Ronaldo Malta** | Dev iniciante em Java — CRUD de entidade simples (Cliente) |
 | **Pedro Vieira** | Dev iniciante em Java — CRUD de entidade simples (Carro) |
-| **Alexandre** | Dev iniciante em Java — Módulo de Pagamento e regras de transação |
+| **Alexandre** | Dev iniciante em Java — Módulo de Cadastro/gestão administrativa e suporte às regras do sistema |
 
 ## 🧩 Divisão de tarefas
 
@@ -47,15 +47,10 @@ Sistema back-end que gerencia clientes, veículos, locações (aluguéis) e paga
 - Endpoint para listar apenas carros disponíveis
 - Testes manuais via Postman/Insomnia
 
-### 🔵 Alexandre — Módulo de Pagamento
-- Modelagem da entidade `Pagamento` (vinculada ao `Aluguel`, com campos como `valorPago`, `dataPagamento`, `metodoPagamento` e `status`)
-- Criação de **Enums** para simplificar o domínio: `MetodoPagamento` (PIX, CARTAO_CREDITO) e `StatusPagamento` (PENDENTE, APROVADO, RECUSADO)
-- Camadas completas de processamento (`PagamentoController`, `PagamentoService`, `PagamentoRepository`)
-- **Regras de negócio e Validações:**
-  - Garantir que o valor do pagamento seja exatamente igual ao valor total do aluguel.
-  - Impedir que um aluguel que já foi pago receba um segundo pagamento.
-- **Integração:** Desenvolver a lógica que, ao confirmar o pagamento, aciona o módulo de `Aluguel` para mudar o status da reserva para "CONFIRMADO/PAGO".
-- Testes manuais via Postman/Insomnia (simulando payloads de transação)
+### 🔵 Alexandre — Módulo Administrativo
+- Apoio à modelagem e manutenção das entidades de apoio ao sistema
+- Organização de rotinas administrativas e documentação complementar do projeto
+- Suporte às validações e às regras de negócio do fluxo principal
 
 ## 🗂️ Estrutura sugerida do projeto
 ```text
@@ -75,11 +70,6 @@ src/main/java/com/carrental/
 │   ├── AluguelController.java
 │   ├── AluguelService.java
 │   └── AluguelRepository.java
-├── pagamento/
-│   ├── Pagamento.java
-│   ├── PagamentoController.java
-│   ├── PagamentoService.java
-│   └── PagamentoRepository.java
 └── exception/
     └── GlobalExceptionHandler.java
 ```
