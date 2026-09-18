@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import Veloce_Rent_a_Car.models.enums.MetodoPagamento;
+import Veloce_Rent_a_Car.models.enums.StatusPagamento;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
