@@ -1,49 +1,50 @@
 package Veloce_Rent_a_Car.models;
 
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "cars")
 public class Carro {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
     private String modelo;
+
+    @Column(nullable = false, unique = true)
     private String placa;
+
+    @Column(nullable = false)
     private String categoria;
-    private String valor_da_diaria;
-    private String status_de_disponibilidade;
 
-    public String getModelo() {
-        return modelo;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal valorDaDiaria;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatusCarro statusDisponibilidade;
+
+    public enum StatusCarro {
+        DISPONIVEL,
+        ALUGADO,
+        MANUTENCAO
     }
 
-    public void setModelo(String modelo) {
+    public Carro(String modelo, String placa, String categoria, BigDecimal valorDaDiaria, StatusCarro status) {
         this.modelo = modelo;
-    }
-
-    public String getPlaca() {
-        return placa;
-    }
-
-    public void setPlaca(String placa) {
         this.placa = placa;
-    }
-
-    public String getCategoria() {
-        return categoria;
-    }
-
-    public void setCategoria(String categoria) {
         this.categoria = categoria;
-    }
-
-    public String getValor_da_diaria() {
-        return valor_da_diaria;
-    }
-
-    public void setValor_da_diaria(String valor_da_diaria) {
-        this.valor_da_diaria = valor_da_diaria;
-    }
-
-    public String getStatus_de_disponibilidade() {
-        return status_de_disponibilidade;
-    }
-
-    public void setStatus_de_disponibilidade(String status_de_disponibilidade) {
-        this.status_de_disponibilidade = status_de_disponibilidade;
+        this.valorDaDiaria = valorDaDiaria;
+        this.statusDisponibilidade = status;
     }
 }
