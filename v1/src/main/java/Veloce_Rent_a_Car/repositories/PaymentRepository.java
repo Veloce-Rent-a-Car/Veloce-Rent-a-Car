@@ -11,4 +11,4 @@ import java.util.List;
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
     List<Payment> findByRentId(Long rentId);
     boolean existsByRentIdAndStatus(Long rentId, StatusPagamento status);
-}
+}cd
