@@ -56,10 +56,8 @@ public class PaymentService {
 
         Payment saved = paymentRepository.save(payment);
 
-        // TODO integracao com o modulo de Aluguel: quando o RentModel tiver um campo
-        // de status de reserva (ex.: RentStatus), marcar aqui o aluguel como "CONFIRMADO/PAGO":
-        // rent.setStatus(RentStatus.CONFIRMADO_PAGO);
-        // rentRepository.save(rent);
+        rent.setStatus(RentModel.RentStatus.CONFIRMED);
+        rentRepository.save(rent);
 
         return saved;
     }
