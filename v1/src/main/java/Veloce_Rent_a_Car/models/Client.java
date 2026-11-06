@@ -53,28 +53,24 @@ public class Client {
         this.name = name;
     }
 
-    public String getCpf() {
-        return cpf;
-    }
+    @Column(nullable = false, unique = true)
+    private String cpf;
 
-    public void setCpf(String cpf) {
+    @Column(nullable = false)
+    private String telefone;
+
+    @Column(nullable = false)
+    private String email;
+
+    @Column
+    private String endereco;
+
+    public Client(String nome, String cpf, String telefone, String email, String endereco) {
+        this.nome = nome;
         this.cpf = cpf;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
+        this.telefone = telefone;
         this.email = email;
+        this.endereco = endereco;
     }
 
     public String getAddress() {

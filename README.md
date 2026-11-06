@@ -92,12 +92,19 @@ cd carrental-api
 
 ---
 
-## 📚 Etapa 1 — Proposta e Escopo
+## 📚 Documentação
+
+|| Documento | Descrição |
+||---|---|
+|| [API Reference](docs/API.md) | Endpoint, modelos, DTOs, regras de negócio e exemplos de uso |
+
+### Etapa 1 — Proposta e Escopo
+
 Documentos gerados para a primeira etapa do Projeto Integrador:
 
-| Documento | Descrição |
-|---|---|
-| [Proposta do Sistema](docs/etapa1/proposta.md) | Apresentação e objetivo do projeto |
-| [Diagrama de Casos de Uso](docs/etapa1/diagrama-casos-de-uso.md) | Diagrama Mermaid com atores e funcionalidades |
-| [Escopo e Domínio](docs/etapa1/escopo.md) | O que o sistema faz e o que não faz |
-| [Justificativa Técnica](docs/etapa1/justificativa-tecnica.md) | Por que esse domínio e essa stack |
+|| Documento | Descrição |
+||---|---|
+|| [Proposta do Sistema](docs/etapa1/proposta.md) | Apresentação e objetivo do projeto |
+|| [Diagrama de Casos de Uso](docs/etapa1/diagrama-casos-de-uso.md) | Diagrama Mermaid com atores e funcionalidades |
+|| [Escopo e Domínio](docs/etapa1/escopo.md) | O que o sistema faz e o que não faz |
+|| [Justificativa Técnica](docs/etapa1/justificativa-tecnica.md) | Por que esse domínio e essa stack |
