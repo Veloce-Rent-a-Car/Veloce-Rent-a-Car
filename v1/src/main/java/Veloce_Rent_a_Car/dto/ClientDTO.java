@@ -5,11 +5,13 @@ import lombok.Data;
 
 @Data
 public class ClientDTO {
+
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
-    private String nome;
+
+    private String name;
     private String cpf;
-    private String telefone;
+    private String phone;
     private String email;
-    private String endereco;
+    private String address;
 }

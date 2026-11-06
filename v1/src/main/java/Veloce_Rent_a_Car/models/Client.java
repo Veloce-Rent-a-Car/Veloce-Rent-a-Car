@@ -1,19 +1,48 @@
 package Veloce_Rent_a_Car.models;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "clients")
 public class Client {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false, unique = true)
     private String cpf;
+
+    @Column(nullable = false)
     private String phone;
+
+    @Column(nullable = false)
     private String email;
+
+    @Column
     private String address;
 
-    public Client(String name, String cpf, String phone, String email, String address) {
+    public Client() {
+    }
+
+    public Client(String name, String cpf, String phone,
+                  String email, String address) {
         this.name = name;
         this.cpf = cpf;
         this.phone = phone;
         this.email = email;
         this.address = address;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
