@@ -1,6 +1,5 @@
 package Veloce_Rent_a_Car.controllers;
 
-import Veloce_Rent_a_Car.dto.ClientDTO;
 import Veloce_Rent_a_Car.models.Client;
 import Veloce_Rent_a_Car.services.ClientService;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,11 +16,13 @@ public class ClientController {
     @Autowired
     private ClientService clientService;
 
+    // Get all clients
     @GetMapping
     public ResponseEntity<List<Client>> getAll() {
         return ResponseEntity.ok(clientService.findAll());
     }
 
+    // Get client by ID
     @GetMapping("/{id}")
     public ResponseEntity<Client> getById(@PathVariable Long id) {
         try {
@@ -31,6 +32,7 @@ public class ClientController {
         }
     }
 
+    // Get client by CPF
     @GetMapping("/cpf/{cpf}")
     public ResponseEntity<Client> getByCpf(@PathVariable String cpf) {
         return clientService.findByCpf(cpf)
@@ -38,6 +40,7 @@ public class ClientController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // Create a new client
     @PostMapping
     public ResponseEntity<Client> create(@RequestBody Client client) {
         try {
@@ -45,6 +48,32 @@ public class ClientController {
             return ResponseEntity.ok(saved);
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // Update an existing client
+    @PutMapping("/{id}")
+    public ResponseEntity<Client> update(
+            @PathVariable Long id,
+            @RequestBody Client updatedClient) {
+
+        try {
+            Client updated = clientService.update(id, updatedClient);
+            return ResponseEntity.ok(updated);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Delete a client
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+
+        try {
+            clientService.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 }

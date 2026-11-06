@@ -1,13 +1,7 @@
 package Veloce_Rent_a_Car.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "clients")
 public class Client {
@@ -17,25 +11,77 @@ public class Client {
     private Long id;
 
     @Column(nullable = false)
-    private String nome;
+    private String name;
 
     @Column(nullable = false, unique = true)
     private String cpf;
 
     @Column(nullable = false)
-    private String telefone;
+    private String phone;
 
     @Column(nullable = false)
     private String email;
 
     @Column
-    private String endereco;
+    private String address;
 
-    public Client(String nome, String cpf, String telefone, String email, String endereco) {
-        this.nome = nome;
+    public Client() {
+    }
+
+    public Client(String name, String cpf, String phone,
+                  String email, String address) {
+        this.name = name;
         this.cpf = cpf;
-        this.telefone = telefone;
+        this.phone = phone;
         this.email = email;
-        this.endereco = endereco;
+        this.address = address;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
