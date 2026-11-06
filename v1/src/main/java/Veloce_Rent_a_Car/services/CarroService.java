@@ -18,7 +18,7 @@ public class CarroService {
     }
 
     public List<Carro> listarCarrosDisponiveis() {
-        return carroRepository.findByStatusDeDisponibilidade("Disponível");
+        return carroRepository.findByStatusDisponibilidade(Carro.StatusCarro.DISPONIVEL);
     }
 
     public Carro buscarPorId(Long id) {
@@ -36,8 +36,8 @@ public class CarroService {
         carroExistente.setModelo(carroAtualizado.getModelo());
         carroExistente.setPlaca(carroAtualizado.getPlaca());
         carroExistente.setCategoria(carroAtualizado.getCategoria());
-        carroExistente.setValorDiaria(carroAtualizado.getValorDiaria());
-        carroExistente.setStatusDeDisponibilidade(carroAtualizado.getStatusDeDisponibilidade());
+        carroExistente.setValorDaDiaria(carroAtualizado.getValorDaDiaria());
+        carroExistente.setStatusDisponibilidade(carroAtualizado.getStatusDisponibilidade());
 
         return carroRepository.save(carroExistente);
     }

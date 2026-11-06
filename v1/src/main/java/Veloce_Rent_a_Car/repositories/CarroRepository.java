@@ -13,5 +13,5 @@ public interface CarroRepository extends JpaRepository<Carro, Long> {
 
     boolean existsByPlaca(String placa);
 
-    List<Carro> findByStatusDeDisponibilidade(String statusDeDisponibilidade);
+    List<Carro> findByStatusDisponibilidade(Carro.StatusCarro statusDisponibilidade);
 }
