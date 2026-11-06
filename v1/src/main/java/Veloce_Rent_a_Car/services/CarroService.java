@@ -36,6 +36,8 @@ public class CarroService {
         carroExistente.setModelo(carroAtualizado.getModelo());
         carroExistente.setPlaca(carroAtualizado.getPlaca());
         carroExistente.setCategoria(carroAtualizado.getCategoria());
+
+        // Atualização segura dos campos (compatível com os nomes da entidade)
         carroExistente.setValorDiaria(carroAtualizado.getValorDiaria());
         carroExistente.setStatusDeDisponibilidade(carroAtualizado.getStatusDeDisponibilidade());
 
