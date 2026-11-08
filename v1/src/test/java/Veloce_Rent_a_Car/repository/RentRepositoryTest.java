@@ -3,11 +3,13 @@ package Veloce_Rent_a_Car.repository;
 import Veloce_Rent_a_Car.models.Carro;
 import Veloce_Rent_a_Car.models.Client;
 import Veloce_Rent_a_Car.models.RentModel;
+import Veloce_Rent_a_Car.repositories.CarroRepository;
+import Veloce_Rent_a_Car.repositories.ClientRepository;
 import Veloce_Rent_a_Car.repositories.RentRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
