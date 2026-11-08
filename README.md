@@ -97,6 +97,7 @@ cd carrental-api
 || Documento | Descrição |
 ||---|---|
 || [API Reference](docs/API.md) | Endpoint, modelos, DTOs, regras de negócio e exemplos de uso |
+|| [TODO / Roadmap](TODO.md) | Lista de tarefas priorizadas (crítico → baixo) |
 
 ### Etapa 1 — Proposta e Escopo
 
