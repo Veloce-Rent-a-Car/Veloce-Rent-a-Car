@@ -2,7 +2,7 @@
 
 ## 🔴 Crítico (bloqueia core)
 - [x] **1. Fix RentService.create()** — Vincular Carro ao aluguel, validar disponibilidade, atualizar status Carro → ALUGADO
-- [ ] **2. Implement SecurityConfig (JWT)** — SecurityFilterChain, JwtFilter, TokenProvider, proteger endpoints, remover senha aleatória
+- [x] **2. Implement SecurityConfig (JWT)** — SecurityFilterChain, JwtFilter, TokenProvider, proteger endpoints, remover senha aleatória
 
 ## 🟠 Alto (bugs latentes / setup)
 - [x] **3. Fix CarroService.atualizar()** — Impedir alteração de `placa` (unique constraint)

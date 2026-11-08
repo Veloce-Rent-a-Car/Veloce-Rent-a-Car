@@ -31,6 +31,9 @@ public class Client {
     @Column
     private String endereco;
 
+    @Column(nullable = false)
+    private String password;
+
     public Client(String nome, String cpf, String telefone, String email, String endereco) {
         this.nome = nome;
         this.cpf = cpf;

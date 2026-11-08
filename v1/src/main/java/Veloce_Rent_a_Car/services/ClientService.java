@@ -4,6 +4,7 @@ import Veloce_Rent_a_Car.models.Client;
 import Veloce_Rent_a_Car.repositories.ClientRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +15,9 @@ public class ClientService {
 
     @Autowired
     private ClientRepository clientRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<Client> findAll() {
         return clientRepository.findAll();
@@ -32,6 +36,7 @@ public class ClientService {
         if (clientRepository.existsByCpf(client.getCpf())) {
             throw new IllegalStateException("Ja existe um cliente com este CPF: " + client.getCpf());
         }
+        client.setPassword(passwordEncoder.encode(client.getPassword()));
         return clientRepository.save(client);
     }
 }
