@@ -2,12 +2,14 @@ package Veloce_Rent_a_Car.v1;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import Veloce_Rent_a_Car.models.Carro;
 import Veloce_Rent_a_Car.models.Client;
 
 import java.math.BigDecimal;
 
 @SpringBootApplication
+@EnableJpaRepositories(basePackages = "Veloce_Rent_a_Car.repositories")
 public class V1Application {
 
     public static void main(String[] args) {

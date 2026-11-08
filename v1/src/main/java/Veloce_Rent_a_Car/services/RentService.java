@@ -4,6 +4,7 @@ import Veloce_Rent_a_Car.dto.NewRentDTO;
 import Veloce_Rent_a_Car.models.Carro;
 import Veloce_Rent_a_Car.models.Client;
 import Veloce_Rent_a_Car.models.RentModel;
+import Veloce_Rent_a_Car.repositories.CarroRepository;
 import Veloce_Rent_a_Car.repositories.ClientRepository;
 import Veloce_Rent_a_Car.repositories.RentRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -23,6 +24,9 @@ public class RentService {
     @Autowired
     private ClientRepository clientRepository;
 
+    @Autowired
+    private CarroRepository carroRepository;
+
     public List<RentModel> findAll() {
         return rentRepository.findAll();
     }
@@ -40,11 +44,20 @@ public class RentService {
         Client client = clientRepository.findByCpf(dto.getClientCpf())
                 .orElseThrow(() -> new EntityNotFoundException("Cliente nao encontrado com CPF: " + dto.getClientCpf()));
 
+        Carro carro = carroRepository.findByModeloAndCategoriaAndStatusDisponibilidade(
+                dto.getCarName(), dto.getCarModelType(), Carro.StatusCarro.DISPONIVEL)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Carro nao encontrado ou indisponivel: " + dto.getCarName() + " " + dto.getCarModelType()));
+
         RentModel rent = new RentModel();
         rent.setClient(client);
+        rent.setCar(carro);
         rent.setRentValue(dto.getRentValue());
         rent.setStartDate(LocalDateTime.now());
         rent.setStatus(RentModel.RentStatus.PENDING);
+
+        carro.setStatusDisponibilidade(Carro.StatusCarro.ALUGADO);
+        carroRepository.save(carro);
 
         return rentRepository.save(rent);
     }

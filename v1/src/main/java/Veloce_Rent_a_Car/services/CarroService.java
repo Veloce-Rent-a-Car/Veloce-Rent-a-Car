@@ -34,7 +34,7 @@ public class CarroService {
         Carro carroExistente = buscarPorId(id);
 
         carroExistente.setModelo(carroAtualizado.getModelo());
-        carroExistente.setPlaca(carroAtualizado.getPlaca());
+        // placa é imutável (unique constraint)
         carroExistente.setCategoria(carroAtualizado.getCategoria());
         carroExistente.setValorDaDiaria(carroAtualizado.getValorDaDiaria());
         carroExistente.setStatusDisponibilidade(carroAtualizado.getStatusDisponibilidade());
