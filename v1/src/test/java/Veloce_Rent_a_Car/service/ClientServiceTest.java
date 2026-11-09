@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +24,9 @@ class ClientServiceTest {
 
     @Mock
     private ClientRepository clientRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private ClientService clientService;
@@ -83,7 +87,9 @@ class ClientServiceTest {
     @Test
     void create_whenCpfNotExists_savesAndReturnsClient() {
         Client client = new Client("Carlos", "55555555555", "11555555555", "carlos@email.com", "PR");
+        client.setPassword("raw-password");
         when(clientRepository.existsByCpf("55555555555")).thenReturn(false);
+        when(passwordEncoder.encode("raw-password")).thenReturn("encoded-password");
         when(clientRepository.save(any(Client.class))).thenAnswer(inv -> {
             Client c = inv.getArgument(0);
             c.setId(10L);
@@ -94,6 +100,8 @@ class ClientServiceTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(10L);
+        assertThat(result.getPassword()).isEqualTo("encoded-password");
+        verify(passwordEncoder).encode("raw-password");
         verify(clientRepository).save(client);
     }
 
