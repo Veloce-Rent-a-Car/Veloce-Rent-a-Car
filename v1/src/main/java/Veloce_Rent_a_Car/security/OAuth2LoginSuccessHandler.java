@@ -1,5 +1,8 @@
 package Veloce_Rent_a_Car.security;
 
+import Veloce_Rent_a_Car.exception.RecursoNaoEncontradoException;
+import Veloce_Rent_a_Car.models.Client;
+import Veloce_Rent_a_Car.repositories.ClientRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,9 +17,11 @@ import java.io.IOException;
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final ClientRepository clientRepository;
 
-    public OAuth2LoginSuccessHandler(JwtTokenProvider jwtTokenProvider) {
+    public OAuth2LoginSuccessHandler(JwtTokenProvider jwtTokenProvider, ClientRepository clientRepository) {
         this.jwtTokenProvider = jwtTokenProvider;
+        this.clientRepository = clientRepository;
     }
 
     @Override
@@ -30,6 +35,14 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Email não fornecido pelo provedor OAuth2");
             return;
         }
+
+        // Verifica se o email já existe como Client
+        // Comportamento: se não existe, retorna 404 com mensagem clara (não cria usuário automaticamente)
+        Client client = clientRepository.findByEmail(email)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Usuário não cadastrado. Email " + email + " não encontrado no sistema. " +
+                        "Faça o cadastro via /api/auth/register antes de usar login OAuth2."
+                ));
 
         // Gera nosso próprio JWT usando o email como username
         String token = jwtTokenProvider.generateTokenFromEmail(email);

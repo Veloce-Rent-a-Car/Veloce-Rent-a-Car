@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -24,7 +25,7 @@ public class CarroCsvService {
     public void exportarParaCsv(Path caminhoArquivo) throws IOException {
         List<Carro> carros = carroRepository.findAll();
 
-        try (BufferedWriter writer = Files.newBufferedWriter(caminhoArquivo)) {
+        try (BufferedWriter writer = Files.newBufferedWriter(caminhoArquivo, StandardCharsets.UTF_8)) {
             writer.write("id,modelo,placa,categoria,valorDaDiaria,statusDisponibilidade");
             writer.newLine();
 
@@ -49,7 +50,7 @@ public class CarroCsvService {
 
         int importados = 0;
 
-        try (BufferedReader reader = Files.newBufferedReader(caminhoArquivo)) {
+        try (BufferedReader reader = Files.newBufferedReader(caminhoArquivo, StandardCharsets.UTF_8)) {
             String linha;
             boolean primeiraLinha = true;
 
@@ -91,10 +92,16 @@ public class CarroCsvService {
 
     private String escapeCsv(String valor) {
         if (valor == null) return "";
-        if (valor.contains(",") || valor.contains("\"") || valor.contains("\n")) {
-            return "\"" + valor.replace("\"", "\"\"") + "\"";
+        String escaped = valor;
+        // Proteção contra CSV Injection: prefixar com ' se começar com = + - @
+        if (escaped.startsWith("=") || escaped.startsWith("+") || escaped.startsWith("-") || escaped.startsWith("@")) {
+            escaped = "'" + escaped;
         }
-        return valor;
+        // Escape de aspas e vírgulas
+        if (escaped.contains(",") || escaped.contains("\"") || escaped.contains("\n")) {
+            escaped = "\"" + escaped.replace("\"", "\"\"") + "\"";
+        }
+        return escaped;
     }
 
     private String[] parseCsvLine(String line) {

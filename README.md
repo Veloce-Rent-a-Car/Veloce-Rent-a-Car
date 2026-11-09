@@ -96,7 +96,7 @@ export OAUTH2_GOOGLE_CLIENT_SECRET="seu-client-secret"
 
 ### Perfil de teste (H2 em memória)
 ```bash
-./mvnw spring-boot:run -Dspring.profiles.active=test
+./mvnw spring-boot:run -Dspring-boot.run.profiles=test
 ```
 
 ## 🧪 Como rodar os testes

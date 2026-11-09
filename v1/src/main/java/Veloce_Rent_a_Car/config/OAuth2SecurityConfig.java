@@ -1,5 +1,7 @@
 package Veloce_Rent_a_Car.config;
 
+import Veloce_Rent_a_Car.repositories.ClientRepository;
+import Veloce_Rent_a_Car.security.JwtTokenProvider;
 import Veloce_Rent_a_Car.security.OAuth2LoginSuccessHandler;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +14,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @ConditionalOnProperty(name = "spring.security.oauth2.client.registration.google.client-id")
 public class OAuth2SecurityConfig {
+
+    @Bean
+    public OAuth2LoginSuccessHandler oauth2LoginSuccessHandler(JwtTokenProvider jwtTokenProvider, ClientRepository clientRepository) {
+        return new OAuth2LoginSuccessHandler(jwtTokenProvider, clientRepository);
+    }
 
     @Bean
     public SecurityFilterChain oauth2SecurityFilterChain(HttpSecurity http, OAuth2LoginSuccessHandler oauth2LoginSuccessHandler) throws Exception {

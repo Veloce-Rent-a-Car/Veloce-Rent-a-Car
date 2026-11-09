@@ -3,6 +3,10 @@ package Veloce_Rent_a_Car.controllers;
 import Veloce_Rent_a_Car.models.Client;
 import Veloce_Rent_a_Car.security.JwtTokenProvider;
 import Veloce_Rent_a_Car.services.ClientService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,7 +45,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         try {
             Client client = new Client();
             client.setName(request.getNome());
@@ -69,11 +73,27 @@ public class AuthController {
     }
 
     public static class RegisterRequest {
+        @NotBlank(message = "Nome é obrigatório")
+        @Size(max = 100, message = "Nome deve ter no máximo 100 caracteres")
         private String nome;
+
+        @NotBlank(message = "CPF é obrigatório")
+        @Size(min = 11, max = 11, message = "CPF deve ter 11 dígitos")
         private String cpf;
+
+        @NotBlank(message = "Telefone é obrigatório")
+        @Size(max = 20, message = "Telefone deve ter no máximo 20 caracteres")
         private String telefone;
+
+        @NotBlank(message = "Email é obrigatório")
+        @Email(message = "Email inválido")
         private String email;
+
+        @Size(max = 200, message = "Endereço deve ter no máximo 200 caracteres")
         private String endereco;
+
+        @NotBlank(message = "Senha é obrigatória")
+        @Size(min = 6, message = "Senha deve ter no mínimo 6 caracteres")
         private String password;
 
         public String getNome() { return nome; }

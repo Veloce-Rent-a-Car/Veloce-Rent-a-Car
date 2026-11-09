@@ -30,8 +30,8 @@ public class CarroCsvController {
 
         Resource resource = new InputStreamResource(Files.newInputStream(tempFile));
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=carros.csv")
-                .contentType(MediaType.parseMediaType("text/csv"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"carros.csv\"")
+                .contentType(MediaType.parseMediaType("text/csv;charset=UTF-8"))
                 .body(resource);
     }
 
@@ -41,6 +41,7 @@ public class CarroCsvController {
             return ResponseEntity.badRequest().body("Arquivo vazio");
         }
 
+        // Não usar nome do arquivo original - segurança
         Path tempFile = Files.createTempFile("import-", ".csv");
         tempFile.toFile().deleteOnExit();
         Files.copy(file.getInputStream(), tempFile, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
