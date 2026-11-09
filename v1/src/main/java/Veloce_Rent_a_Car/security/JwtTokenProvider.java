@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -33,6 +34,12 @@ public class JwtTokenProvider {
                 .map(a -> a.getAuthority())
                 .toList());
         return createToken(claims, userDetails.getUsername());
+    }
+
+    public String generateTokenFromEmail(String email) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", List.of("ROLE_USER"));
+        return createToken(claims, email);
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
