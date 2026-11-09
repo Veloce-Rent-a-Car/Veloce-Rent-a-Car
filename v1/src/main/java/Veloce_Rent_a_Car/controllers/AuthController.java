@@ -1,0 +1,92 @@
+package Veloce_Rent_a_Car.controllers;
+
+import Veloce_Rent_a_Car.models.Client;
+import Veloce_Rent_a_Car.security.JwtTokenProvider;
+import Veloce_Rent_a_Car.services.ClientService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/auth")
+public class AuthController {
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private ClientService clientService;
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getCpf(), request.getPassword())
+            );
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            String token = jwtTokenProvider.generateToken(userDetails);
+            return ResponseEntity.ok(Map.of("token", token, "type", "Bearer"));
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body(Map.of("error", "Credenciais inválidas"));
+        }
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        try {
+            Client client = new Client();
+            client.setNome(request.getNome());
+            client.setCpf(request.getCpf());
+            client.setTelefone(request.getTelefone());
+            client.setEmail(request.getEmail());
+            client.setEndereco(request.getEndereco());
+            client.setPassword(request.getPassword()); // will be encoded in service
+            
+            Client saved = clientService.create(client);
+            return ResponseEntity.ok(Map.of("message", "Cliente cadastrado com sucesso", "id", saved.getId()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    public static class LoginRequest {
+        private String cpf;
+        private String password;
+
+        public String getCpf() { return cpf; }
+        public void setCpf(String cpf) { this.cpf = cpf; }
+        public String getPassword() { return password; }
+        public void setPassword(String password) { this.password = password; }
+    }
+
+    public static class RegisterRequest {
+        private String nome;
+        private String cpf;
+        private String telefone;
+        private String email;
+        private String endereco;
+        private String password;
+
+        public String getNome() { return nome; }
+        public void setNome(String nome) { this.nome = nome; }
+        public String getCpf() { return cpf; }
+        public void setCpf(String cpf) { this.cpf = cpf; }
+        public String getTelefone() { return telefone; }
+        public void setTelefone(String telefone) { this.telefone = telefone; }
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+        public String getEndereco() { return endereco; }
+        public void setEndereco(String endereco) { this.endereco = endereco; }
+        public String getPassword() { return password; }
+        public void setPassword(String password) { this.password = password; }
+    }
+}

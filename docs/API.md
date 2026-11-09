@@ -40,7 +40,16 @@ A **CarRental API** é uma aplicação backend REST para gestão de locação de
 
 ### 🟡 Módulo de Carros
 
-> **Nota:** O módulo de carros ainda não possui controller REST implementado. A entidade `Carro` existe com JPA e repositório, aguardando implementação do `CarroController`, `CarroService` e os endpoints correspondentes.
+#### Endpoints
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| `GET` | `/api/carros` | Listar todos os carros |
+| `GET` | `/api/carros/disponiveis` | Listar apenas carros disponíveis |
+| `GET` | `/api/carros/{id}` | Buscar carro por ID |
+| `POST` | `/api/carros` | Cadastrar novo carro |
+| `PUT` | `/api/carros/{id}` | Atualizar carro |
+| `DELETE` | `/api/carros/{id}` | Deletar carro |
 
 #### Entidade Carro (modelo)
 
@@ -298,7 +307,7 @@ O projeto possui pipeline GitHub Actions que roda em todo push/PR para `main`:
 | Modulo | Status |
 |--------|--------|
 | Client | ✅ Completo — entidade, repo, service, controller, endpoints REST |
-| Carro | ⚙️ Parcial — entidade JPA + repo prontos; faltam controller, service e endpoints REST |
+| Carro | ✅ Completo — entidade, repo, service, controller, endpoints REST |
 | Aluguel | ✅ Completo — entidade JPA, repo, service, controller, endpoints REST |
 | Pagamento | ✅ Completo — entidade JPA, repo, service, controller, endpoints REST |
 

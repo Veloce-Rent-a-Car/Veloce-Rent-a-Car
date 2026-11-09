@@ -1,3 +1,4 @@
+
 package Veloce_Rent_a_Car.models;
 
 import jakarta.persistence.*;
@@ -10,20 +11,23 @@ public class Client {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "nome")
     private String name;
 
     @Column(nullable = false, unique = true)
     private String cpf;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "telefone")
     private String phone;
 
     @Column(nullable = false)
     private String email;
 
-    @Column
+    @Column(name = "endereco")
     private String address;
+
+    @Column(nullable = false)
+    private String password;
 
     public Client() {
     }
@@ -53,6 +57,14 @@ public class Client {
         this.name = name;
     }
 
+    public String getNome() {
+        return name;
+    }
+
+    public void setNome(String nome) {
+        this.name = nome;
+    }
+
     public String getCpf() {
         return cpf;
     }
@@ -69,6 +81,14 @@ public class Client {
         this.phone = phone;
     }
 
+    public String getTelefone() {
+        return phone;
+    }
+
+    public void setTelefone(String telefone) {
+        this.phone = telefone;
+    }
+
     public String getEmail() {
         return email;
     }
@@ -83,5 +103,21 @@ public class Client {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getEndereco() {
+        return address;
+    }
+
+    public void setEndereco(String endereco) {
+        this.address = endereco;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

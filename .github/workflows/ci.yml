@@ -5,6 +5,8 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  schedule:
+    - cron: '0 2 * * 1'  # weekly dependency check (Mondays 02:00 UTC)
 
 jobs:
   build:
@@ -34,8 +36,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
+          cache-key: ${{ runner.os }}-maven-${{ hashFiles('v1/pom.xml') }}
+          cache-restore-keys: |
+            ${{ runner.os }}-maven-
 
-      - name: Build with Maven
+      - name: Build & Test with Maven
         run: |
           cd v1
           chmod +x mvnw
@@ -44,3 +49,60 @@ jobs:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/carrental
           SPRING_DATASOURCE_USERNAME: postgres
           SPRING_DATASOURCE_PASSWORD: postgres
+
+      - name: Upload JaCoCo Coverage Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: v1/target/site/jacoco/
+          retention-days: 7
+
+      - name: Comment Coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: madrapps/jacoco-report@v1.6
+        with:
+          paths: v1/target/site/jacoco/jacoco.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "Code Coverage Report"
+          min-coverage-overall: 70
+          min-coverage-changed-files: 50
+
+  dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Run OWASP Dependency Check
+        run: |
+          cd v1
+          chmod +x mvnw
+          ./mvnw org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=7
+        continue-on-error: true
+
+  docker:
+    needs: build
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./v1
+          push: true
+          tags: ghcr.io/${{ github.repository }}/veloce-rent-a-car:${{ github.ref_name }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
