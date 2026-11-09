@@ -53,7 +53,7 @@ class ClientServiceTest {
         Client result = clientService.findById(1L);
 
         assertThat(result).isNotNull();
-        assertThat(result.getNome()).isEqualTo("Pedro");
+        assertThat(result.getName()).isEqualTo("Pedro");
     }
 
     @Test
@@ -73,7 +73,7 @@ class ClientServiceTest {
         Optional<Client> result = clientService.findByCpf("44444444444");
 
         assertThat(result).isPresent();
-        assertThat(result.get().getNome()).isEqualTo("Ana");
+        assertThat(result.get().getName()).isEqualTo("Ana");
     }
 
     @Test

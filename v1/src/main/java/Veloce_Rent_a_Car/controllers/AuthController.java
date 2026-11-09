@@ -44,13 +44,13 @@ public class AuthController {
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
             Client client = new Client();
-            client.setNome(request.getNome());
+            client.setName(request.getNome());
             client.setCpf(request.getCpf());
-            client.setTelefone(request.getTelefone());
+            client.setPhone(request.getTelefone());
             client.setEmail(request.getEmail());
-            client.setEndereco(request.getEndereco());
-            client.setPassword(request.getPassword()); // will be encoded in service
-            
+            client.setAddress(request.getEndereco());
+            client.setPassword(request.getPassword());
+
             Client saved = clientService.create(client);
             return ResponseEntity.ok(Map.of("message", "Cliente cadastrado com sucesso", "id", saved.getId()));
         } catch (IllegalStateException e) {

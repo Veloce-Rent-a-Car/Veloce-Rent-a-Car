@@ -59,7 +59,7 @@ class ClientRepositoryTest {
                 clientRepository.findByCpf("12345678901");
 
         assertThat(found).isPresent();
-        assertThat(found.get().getNome())
+        assertThat(found.get().getName())
                 .isEqualTo("João Silva");
         assertThat(found.get().getCpf())
                 .isEqualTo("12345678901");
@@ -113,7 +113,7 @@ class ClientRepositoryTest {
                 clientRepository.findById(saved.getId());
 
         assertThat(found).isPresent();
-        assertThat(found.get().getNome())
+        assertThat(found.get().getName())
                 .isEqualTo("Pedro Oliveira");
     }
 }
