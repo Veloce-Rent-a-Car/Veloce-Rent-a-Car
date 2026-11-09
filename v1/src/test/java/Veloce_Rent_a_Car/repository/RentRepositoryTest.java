@@ -1,122 +1,225 @@
 package Veloce_Rent_a_Car.repository;
 
+import Veloce_Rent_a_Car.dto.NewRentDTO;
 import Veloce_Rent_a_Car.models.Carro;
 import Veloce_Rent_a_Car.models.Client;
 import Veloce_Rent_a_Car.models.RentModel;
 import Veloce_Rent_a_Car.repositories.CarroRepository;
 import Veloce_Rent_a_Car.repositories.ClientRepository;
 import Veloce_Rent_a_Car.repositories.RentRepository;
+import Veloce_Rent_a_Car.services.RentService;
+
+import jakarta.persistence.EntityNotFoundException;
+
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ActiveProfiles("test")
+@ExtendWith(MockitoExtension.class)
 class RentRepositoryTest {
 
-    @Autowired
+    @Mock
     private RentRepository rentRepository;
 
-    @Autowired
+    @Mock
     private ClientRepository clientRepository;
 
-    @Autowired
+    @Mock
     private CarroRepository carroRepository;
 
-    private Client createClient(String nome, String cpf) {
-        Client client = new Client(nome, cpf, "11999999999", "email@test.com", "Cidade");
-        return clientRepository.save(client);
+    @InjectMocks
+    private RentService rentService;
+
+    @Test
+    void findAll_returnsAllRents() {
+        RentModel rent1 = new RentModel();
+        RentModel rent2 = new RentModel();
+
+        when(rentRepository.findAll())
+                .thenReturn(List.of(rent1, rent2));
+
+        List<RentModel> result = rentService.findAll();
+
+        assertThat(result).hasSize(2);
+
+        verify(rentRepository).findAll();
     }
 
-    private Carro createCarro(String modelo, String placa) {
-        Carro carro = new Carro(modelo, placa, "sedan", new BigDecimal("300.00"), Carro.StatusCarro.DISPONIVEL);
-        return carroRepository.save(carro);
-    }
-
-    private RentModel createRent(Client client, Carro carro, RentModel.RentStatus status) {
+    @Test
+    void findById_whenExists_returnsRent() {
         RentModel rent = new RentModel();
-        rent.setClient(client);
-        rent.setCar(carro);
-        rent.setRentValue(new BigDecimal("300.00"));
-        rent.setStartDate(LocalDateTime.now());
-        rent.setStatus(status);
-        return rentRepository.save(rent);
+        rent.setId(1L);
+
+        when(rentRepository.findById(1L))
+                .thenReturn(Optional.of(rent));
+
+        RentModel result = rentService.findById(1L);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(1L);
     }
 
     @Test
-    void findByClientId_returnsRentsForClient() {
-        Client client1 = createClient("Cliente 1", "11111111111");
-        Client client2 = createClient("Cliente 2", "22222222222");
-        Carro carro = createCarro("Civic", "ABC1234");
+    void findById_whenNotExists_throwsEntityNotFoundException() {
+        when(rentRepository.findById(999L))
+                .thenReturn(Optional.empty());
 
-        createRent(client1, carro, RentModel.RentStatus.PENDING);
-        createRent(client1, carro, RentModel.RentStatus.CONFIRMED);
-        createRent(client2, carro, RentModel.RentStatus.ACTIVE);
-
-        Optional<RentModel> rentClient1 = rentRepository.findByClientId(client1.getId());
-        Optional<RentModel> rentClient2 = rentRepository.findByClientId(client2.getId());
-
-        assertThat(rentClient1).isPresent();
-        assertThat(rentClient2).isPresent();
+        assertThatThrownBy(() -> rentService.findById(999L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessageContaining(
+                        "Aluguel nao encontrado com id: 999"
+                );
     }
 
     @Test
-    void findByCarId_returnsRentsForCar() {
-        Client client = createClient("Cliente", "33333333333");
-        Carro carro1 = createCarro("Civic", "AAA1111");
-        Carro carro2 = createCarro("Corolla", "BBB2222");
+    void findByClient_returnsRentsForClient() {
+        RentModel rent1 = new RentModel();
+        rent1.setId(1L);
 
-        createRent(client, carro1, RentModel.RentStatus.PENDING);
-        createRent(client, carro1, RentModel.RentStatus.ACTIVE);
-        createRent(client, carro2, RentModel.RentStatus.FINISHED);
+        RentModel rent2 = new RentModel();
+        rent2.setId(2L);
 
-        List<RentModel> rentsCarro1 = rentRepository.findByCarId(carro1.getId());
-        List<RentModel> rentsCarro2 = rentRepository.findByCarId(carro2.getId());
+        when(rentRepository.findByClientId(1L))
+                .thenReturn(List.of(rent1, rent2));
 
-        assertThat(rentsCarro1).hasSize(2);
-        assertThat(rentsCarro2).hasSize(1);
+        List<RentModel> result = rentService.findByClient(1L);
+
+        assertThat(result).hasSize(2);
+
+        assertThat(result)
+                .extracting(RentModel::getId)
+                .containsExactlyInAnyOrder(1L, 2L);
+
+        verify(rentRepository).findByClientId(1L);
     }
 
     @Test
-    void findByStatus_returnsRentsWithMatchingStatus() {
-        Client client = createClient("Cliente", "44444444444");
-        Carro carro = createCarro("Civic", "CCC3333");
+    void create_whenClientExists_createsRent() {
+        Client client = new Client(
+                "João",
+                "11111111111",
+                "11999999999",
+                "joao@email.com",
+                "SP"
+        );
 
-        createRent(client, carro, RentModel.RentStatus.PENDING);
-        createRent(client, carro, RentModel.RentStatus.PENDING);
-        createRent(client, carro, RentModel.RentStatus.CONFIRMED);
-        createRent(client, carro, RentModel.RentStatus.FINISHED);
+        client.setId(1L);
 
-        List<RentModel> pending = rentRepository.findByStatus(RentModel.RentStatus.PENDING);
-        List<RentModel> confirmed = rentRepository.findByStatus(RentModel.RentStatus.CONFIRMED);
-        List<RentModel> finished = rentRepository.findByStatus(RentModel.RentStatus.FINISHED);
+        Carro car = new Carro(
+                "Civic",
+                "ABC1234",
+                "sedan",
+                new BigDecimal("300.00"),
+                Carro.StatusCarro.DISPONIVEL
+        );
 
-        assertThat(pending).hasSize(2);
-        assertThat(confirmed).hasSize(1);
-        assertThat(finished).hasSize(1);
+        car.setId(2L);
+
+        NewRentDTO dto = new NewRentDTO();
+        dto.setClientCpf("11111111111");
+        dto.setCarName("Civic");
+        dto.setCarModelType("sedan");
+        dto.setRentValue(new BigDecimal("300.00"));
+
+        when(clientRepository.findByCpf("11111111111"))
+                .thenReturn(Optional.of(client));
+
+        when(carroRepository
+                .findByModeloAndCategoriaAndStatusDisponibilidade(
+                        "Civic",
+                        "sedan",
+                        Carro.StatusCarro.DISPONIVEL
+                ))
+                .thenReturn(Optional.of(car));
+
+        when(rentRepository.save(any(RentModel.class)))
+                .thenAnswer(invocation -> {
+                    RentModel rent = invocation.getArgument(0);
+                    rent.setId(10L);
+                    return rent;
+                });
+
+        RentModel result = rentService.create(dto);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(10L);
+
+        assertThat(result.getClient().getId())
+                .isEqualTo(1L);
+
+        assertThat(result.getCar().getId())
+                .isEqualTo(2L);
+
+        assertThat(result.getRentValue())
+                .isEqualByComparingTo(
+                        new BigDecimal("300.00")
+                );
+
+        assertThat(result.getStatus())
+                .isEqualTo(RentModel.RentStatus.PENDING);
+
+        assertThat(result.getStartDate()).isNotNull();
+
+        assertThat(car.getStatusDisponibilidade())
+                .isEqualTo(Carro.StatusCarro.ALUGADO);
+
+        verify(carroRepository).save(car);
+        verify(rentRepository).save(any(RentModel.class));
     }
 
     @Test
-    void save_andFindById_works() {
-        Client client = createClient("Cliente", "55555555555");
-        Carro carro = createCarro("Civic", "DDD4444");
-        RentModel rent = createRent(client, carro, RentModel.RentStatus.PENDING);
+    void create_whenClientNotExists_throwsEntityNotFoundException() {
+        NewRentDTO dto = new NewRentDTO();
 
-        Optional<RentModel> found = rentRepository.findById(rent.getId());
+        dto.setClientCpf("99999999999");
+        dto.setRentValue(new BigDecimal("300.00"));
 
-        assertThat(found).isPresent();
-        assertThat(found.get().getClient().getId()).isEqualTo(client.getId());
-        assertThat(found.get().getCar().getId()).isEqualTo(carro.getId());
-        assertThat(found.get().getStatus()).isEqualTo(RentModel.RentStatus.PENDING);
+        when(clientRepository.findByCpf("99999999999"))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> rentService.create(dto))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessageContaining(
+                        "Cliente nao encontrado com CPF: 99999999999"
+                );
+
+        verify(rentRepository, never()).save(any());
+        verify(carroRepository, never()).save(any());
+    }
+
+    @Test
+    void updateStatus_updatesAndReturnsRent() {
+        RentModel rent = new RentModel();
+        rent.setId(1L);
+        rent.setStatus(RentModel.RentStatus.PENDING);
+
+        when(rentRepository.findById(1L))
+                .thenReturn(Optional.of(rent));
+
+        when(rentRepository.save(any(RentModel.class)))
+                .thenAnswer(invocation ->
+                        invocation.getArgument(0)
+                );
+
+        RentModel result = rentService.updateStatus(
+                1L,
+                RentModel.RentStatus.CONFIRMED
+        );
+
+        assertThat(result.getStatus())
+                .isEqualTo(RentModel.RentStatus.CONFIRMED);
+
+        verify(rentRepository).save(rent);
     }
 }

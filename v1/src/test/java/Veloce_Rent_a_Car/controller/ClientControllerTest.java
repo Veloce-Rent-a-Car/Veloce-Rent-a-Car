@@ -1,17 +1,21 @@
+
 package Veloce_Rent_a_Car.controller;
 
 import Veloce_Rent_a_Car.models.Client;
 import Veloce_Rent_a_Car.repositories.ClientRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import Veloce_Rent_a_Car.v1.V1Application;
+
+import tools.jackson.databind.ObjectMapper;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import Veloce_Rent_a_Car.v1.V1Application;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -33,6 +37,21 @@ class ClientControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private Client createTestClient(
+            String name,
+            String cpf,
+            String phone,
+            String email,
+            String address) {
+
+        Client client = new Client(
+                name, cpf, phone, email, address
+        );
+
+        client.setPassword("test-password-hash");
+        return client;
+    }
+
     @Test
     void getAll_returnsEmptyListInitially() throws Exception {
         mockMvc.perform(get("/api/clients"))
@@ -41,25 +60,46 @@ class ClientControllerTest {
     }
 
     @Test
+    @WithMockUser
     void createClient_returnsCreatedClient() throws Exception {
-        Client client = new Client("João Silva", "12345678901", "11999999999", "joao@email.com", "São Paulo");
+        Client client = createTestClient(
+                "João Silva",
+                "12345678901",
+                "11999999999",
+                "joao@email.com",
+                "São Paulo"
+        );
 
         mockMvc.perform(post("/api/clients")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(client)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.nome", is("João Silva")))
+                .andExpect(jsonPath("$.name", is("João Silva")))
                 .andExpect(jsonPath("$.cpf", is("12345678901")))
                 .andExpect(jsonPath("$.email", is("joao@email.com")));
     }
 
     @Test
+    @WithMockUser
     void createClient_whenCpfExists_returnsBadRequest() throws Exception {
-        Client client1 = new Client("João", "11111111111", "11999999999", "joao@email.com", "SP");
-        clientRepository.save(client1);
+        Client client1 = createTestClient(
+                "João",
+                "11111111111",
+                "11999999999",
+                "joao@email.com",
+                "SP"
+        );
 
-        Client client2 = new Client("Maria", "11111111111", "11888888888", "maria@email.com", "RJ");
+        clientRepository.saveAndFlush(client1);
+
+        Client client2 = createTestClient(
+                "Maria",
+                "11111111111",
+                "11888888888",
+                "maria@email.com",
+                "RJ"
+        );
 
         mockMvc.perform(post("/api/clients")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -69,12 +109,20 @@ class ClientControllerTest {
 
     @Test
     void getById_returnsClient() throws Exception {
-        Client client = clientRepository.save(new Client("Pedro", "22222222222", "11777777777", "pedro@email.com", "MG"));
+        Client client = clientRepository.saveAndFlush(
+                createTestClient(
+                        "Pedro",
+                        "22222222222",
+                        "11777777777",
+                        "pedro@email.com",
+                        "MG"
+                )
+        );
 
         mockMvc.perform(get("/api/clients/{id}", client.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(client.getId().intValue())))
-                .andExpect(jsonPath("$.nome", is("Pedro")));
+                .andExpect(jsonPath("$.name", is("Pedro")));
     }
 
     @Test
@@ -85,7 +133,15 @@ class ClientControllerTest {
 
     @Test
     void getByCpf_returnsClient() throws Exception {
-        Client client = clientRepository.save(new Client("Ana", "33333333333", "11666666666", "ana@email.com", "RS"));
+        Client client = clientRepository.saveAndFlush(
+                createTestClient(
+                        "Ana",
+                        "33333333333",
+                        "11666666666",
+                        "ana@email.com",
+                        "RS"
+                )
+        );
 
         mockMvc.perform(get("/api/clients/cpf/{cpf}", "33333333333"))
                 .andExpect(status().isOk())

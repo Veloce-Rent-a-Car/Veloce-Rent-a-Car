@@ -1,8 +1,10 @@
+
 package Veloce_Rent_a_Car.controllers;
 
 import Veloce_Rent_a_Car.dto.NewRentDTO;
 import Veloce_Rent_a_Car.models.RentModel;
 import Veloce_Rent_a_Car.services.RentService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,10 +29,12 @@ public class RentController {
     }
 
     @GetMapping("/client/{clientId}")
-    public ResponseEntity<RentModel> getByClient(@PathVariable Long clientId) {
-        return rentService.findByClient(clientId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<List<RentModel>> getByClient(
+            @PathVariable Long clientId) {
+
+        List<RentModel> rents = rentService.findByClient(clientId);
+
+        return ResponseEntity.ok(rents);
     }
 
     @PostMapping
@@ -43,7 +47,12 @@ public class RentController {
     public ResponseEntity<RentModel> updateStatus(
             @PathVariable Long id,
             @RequestParam String status) {
-        RentModel.RentStatus rentStatus = RentModel.RentStatus.valueOf(status.toUpperCase());
-        return ResponseEntity.ok(rentService.updateStatus(id, rentStatus));
+
+        RentModel.RentStatus rentStatus =
+                RentModel.RentStatus.valueOf(status.toUpperCase());
+
+        return ResponseEntity.ok(
+                rentService.updateStatus(id, rentStatus)
+        );
     }
 }

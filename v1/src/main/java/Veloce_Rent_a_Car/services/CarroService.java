@@ -1,7 +1,11 @@
+
 package Veloce_Rent_a_Car.services;
 
 import Veloce_Rent_a_Car.models.Carro;
 import Veloce_Rent_a_Car.repositories.CarroRepository;
+
+import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +22,16 @@ public class CarroService {
     }
 
     public List<Carro> listarCarrosDisponiveis() {
-        return carroRepository.findByStatusDisponibilidade(Carro.StatusCarro.DISPONIVEL);
+        return carroRepository.findByStatusDisponibilidade(
+                Carro.StatusCarro.DISPONIVEL
+        );
     }
 
     public Carro buscarPorId(Long id) {
         return carroRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Carro não encontrado com o ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Carro não encontrado com o ID: " + id
+                ));
     }
 
     public Carro salvar(Carro carro) {
@@ -34,10 +42,13 @@ public class CarroService {
         Carro carroExistente = buscarPorId(id);
 
         carroExistente.setModelo(carroAtualizado.getModelo());
-        // placa é imutável (unique constraint)
+
+        // A placa é imutável.
         carroExistente.setCategoria(carroAtualizado.getCategoria());
         carroExistente.setValorDaDiaria(carroAtualizado.getValorDaDiaria());
-        carroExistente.setStatusDisponibilidade(carroAtualizado.getStatusDisponibilidade());
+        carroExistente.setStatusDisponibilidade(
+                carroAtualizado.getStatusDisponibilidade()
+        );
 
         return carroRepository.save(carroExistente);
     }
