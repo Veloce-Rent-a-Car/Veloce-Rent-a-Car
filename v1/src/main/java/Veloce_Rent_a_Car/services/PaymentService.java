@@ -1,12 +1,15 @@
 package Veloce_Rent_a_Car.services;
 
 import Veloce_Rent_a_Car.dto.NewPaymentDTO;
+import Veloce_Rent_a_Car.exception.RecursoNaoEncontradoException;
+import Veloce_Rent_a_Car.exception.RegraDeNegocioException;
+import Veloce_Rent_a_Car.exception.ValidacaoException;
 import Veloce_Rent_a_Car.models.Payment;
 import Veloce_Rent_a_Car.models.RentModel;
 import Veloce_Rent_a_Car.models.enums.StatusPagamento;
 import Veloce_Rent_a_Car.repositories.PaymentRepository;
 import Veloce_Rent_a_Car.repositories.RentRepository;
-import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +31,7 @@ public class PaymentService {
 
     public Payment findById(Long id) {
         return paymentRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Pagamento nao encontrado com id: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Pagamento nao encontrado com id: " + id));
     }
 
     public List<Payment> findByRentId(Long rentId) {
@@ -37,14 +40,14 @@ public class PaymentService {
 
     public Payment create(NewPaymentDTO dto) {
         RentModel rent = rentRepository.findById(dto.getRentId())
-                .orElseThrow(() -> new EntityNotFoundException("Aluguel nao encontrado com id: " + dto.getRentId()));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Aluguel nao encontrado com id: " + dto.getRentId()));
 
         if (paymentRepository.existsByRentIdAndStatus(dto.getRentId(), StatusPagamento.APROVADO)) {
-            throw new IllegalStateException("Este aluguel ja foi pago.");
+            throw new RegraDeNegocioException("Este aluguel ja foi pago.");
         }
 
         if (dto.getValorPago() == null || dto.getValorPago().compareTo(rent.getRentValue()) != 0) {
-            throw new IllegalArgumentException("O valor do pagamento deve ser exatamente igual ao valor do aluguel.");
+            throw new ValidacaoException("O valor do pagamento deve ser exatamente igual ao valor do aluguel.");
         }
 
         Payment payment = new Payment();

@@ -4,28 +4,28 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.Instant;
 import java.util.stream.Collectors;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFound(EntityNotFoundException ex, WebRequest req) {
+    @ExceptionHandler({EntityNotFoundException.class, RecursoNaoEncontradoException.class})
+    public ResponseEntity<ErrorResponse> handleNotFound(RuntimeException ex, WebRequest req) {
         return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), req);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleBadRequest(IllegalArgumentException ex, WebRequest req) {
+    @ExceptionHandler({IllegalArgumentException.class, ValidacaoException.class})
+    public ResponseEntity<ErrorResponse> handleBadRequest(RuntimeException ex, WebRequest req) {
         return buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
     }
 
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<ErrorResponse> handleConflict(IllegalStateException ex, WebRequest req) {
+    @ExceptionHandler({IllegalStateException.class, RegraDeNegocioException.class})
+    public ResponseEntity<ErrorResponse> handleConflict(RuntimeException ex, WebRequest req) {
         return buildError(HttpStatus.CONFLICT, ex.getMessage(), req);
     }
 

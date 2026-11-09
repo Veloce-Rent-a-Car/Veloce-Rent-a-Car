@@ -1,9 +1,10 @@
 package Veloce_Rent_a_Car.service;
 
+import Veloce_Rent_a_Car.exception.RecursoNaoEncontradoException;
+import Veloce_Rent_a_Car.exception.RegraDeNegocioException;
 import Veloce_Rent_a_Car.models.Client;
 import Veloce_Rent_a_Car.repositories.ClientRepository;
 import Veloce_Rent_a_Car.services.ClientService;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -56,11 +57,11 @@ class ClientServiceTest {
     }
 
     @Test
-    void findById_whenNotExists_throwsEntityNotFoundException() {
+    void findById_whenNotExists_throwsRecursoNaoEncontradoException() {
         when(clientRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> clientService.findById(999L))
-                .isInstanceOf(EntityNotFoundException.class)
+                .isInstanceOf(RecursoNaoEncontradoException.class)
                 .hasMessageContaining("Cliente nao encontrado com id: 999");
     }
 
@@ -106,12 +107,12 @@ class ClientServiceTest {
     }
 
     @Test
-    void create_whenCpfExists_throwsIllegalStateException() {
+    void create_whenCpfExists_throwsRegraDeNegocioException() {
         Client client = new Client("Carlos", "55555555555", "11555555555", "carlos@email.com", "PR");
         when(clientRepository.existsByCpf("55555555555")).thenReturn(true);
 
         assertThatThrownBy(() -> clientService.create(client))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(RegraDeNegocioException.class)
                 .hasMessageContaining("Ja existe um cliente com este CPF");
 
         verify(clientRepository, never()).save(any());

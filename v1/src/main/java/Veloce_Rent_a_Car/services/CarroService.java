@@ -1,10 +1,9 @@
 
 package Veloce_Rent_a_Car.services;
 
+import Veloce_Rent_a_Car.exception.RecursoNaoEncontradoException;
 import Veloce_Rent_a_Car.models.Carro;
 import Veloce_Rent_a_Car.repositories.CarroRepository;
-
-import jakarta.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,7 @@ public class CarroService {
 
     public Carro buscarPorId(Long id) {
         return carroRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Carro não encontrado com o ID: " + id
                 ));
     }

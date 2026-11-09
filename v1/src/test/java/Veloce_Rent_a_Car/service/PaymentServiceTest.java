@@ -1,6 +1,9 @@
 package Veloce_Rent_a_Car.service;
 
 import Veloce_Rent_a_Car.dto.NewPaymentDTO;
+import Veloce_Rent_a_Car.exception.RecursoNaoEncontradoException;
+import Veloce_Rent_a_Car.exception.RegraDeNegocioException;
+import Veloce_Rent_a_Car.exception.ValidacaoException;
 import Veloce_Rent_a_Car.models.Payment;
 import Veloce_Rent_a_Car.models.RentModel;
 import Veloce_Rent_a_Car.models.enums.MetodoPagamento;
@@ -8,7 +11,7 @@ import Veloce_Rent_a_Car.models.enums.StatusPagamento;
 import Veloce_Rent_a_Car.repositories.PaymentRepository;
 import Veloce_Rent_a_Car.repositories.RentRepository;
 import Veloce_Rent_a_Car.services.PaymentService;
-import jakarta.persistence.EntityNotFoundException;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -62,11 +65,11 @@ class PaymentServiceTest {
     }
 
     @Test
-    void findById_whenNotExists_throwsEntityNotFoundException() {
+    void findById_whenNotExists_throwsRecursoNaoEncontradoException() {
         when(paymentRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> paymentService.findById(999L))
-                .isInstanceOf(EntityNotFoundException.class)
+                .isInstanceOf(RecursoNaoEncontradoException.class)
                 .hasMessageContaining("Pagamento nao encontrado com id: 999");
     }
 
@@ -113,7 +116,7 @@ class PaymentServiceTest {
     }
 
     @Test
-    void create_whenRentNotExists_throwsEntityNotFoundException() {
+    void create_whenRentNotExists_throwsRecursoNaoEncontradoException() {
         NewPaymentDTO dto = new NewPaymentDTO();
         dto.setRentId(999L);
         dto.setValorPago(new BigDecimal("300.00"));
@@ -122,12 +125,12 @@ class PaymentServiceTest {
         when(rentRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> paymentService.create(dto))
-                .isInstanceOf(EntityNotFoundException.class)
+                .isInstanceOf(RecursoNaoEncontradoException.class)
                 .hasMessageContaining("Aluguel nao encontrado com id: 999");
     }
 
     @Test
-    void create_whenRentAlreadyPaid_throwsIllegalStateException() {
+    void create_whenRentAlreadyPaid_throwsRegraDeNegocioException() {
         RentModel rent = new RentModel();
         rent.setId(1L);
         rent.setRentValue(new BigDecimal("300.00"));
@@ -141,12 +144,12 @@ class PaymentServiceTest {
         when(paymentRepository.existsByRentIdAndStatus(1L, StatusPagamento.APROVADO)).thenReturn(true);
 
         assertThatThrownBy(() -> paymentService.create(dto))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(RegraDeNegocioException.class)
                 .hasMessageContaining("Este aluguel ja foi pago");
     }
 
     @Test
-    void create_whenValorDifferentFromRentValue_throwsIllegalArgumentException() {
+    void create_whenValorDifferentFromRentValue_throwsValidacaoException() {
         RentModel rent = new RentModel();
         rent.setId(1L);
         rent.setRentValue(new BigDecimal("300.00"));
@@ -160,12 +163,12 @@ class PaymentServiceTest {
         when(paymentRepository.existsByRentIdAndStatus(1L, StatusPagamento.APROVADO)).thenReturn(false);
 
         assertThatThrownBy(() -> paymentService.create(dto))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(ValidacaoException.class)
                 .hasMessageContaining("valor do pagamento deve ser exatamente igual");
     }
 
     @Test
-    void create_whenValorIsNull_throwsIllegalArgumentException() {
+    void create_whenValorIsNull_throwsValidacaoException() {
         RentModel rent = new RentModel();
         rent.setId(1L);
         rent.setRentValue(new BigDecimal("300.00"));
@@ -179,7 +182,7 @@ class PaymentServiceTest {
         when(paymentRepository.existsByRentIdAndStatus(1L, StatusPagamento.APROVADO)).thenReturn(false);
 
         assertThatThrownBy(() -> paymentService.create(dto))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(ValidacaoException.class)
                 .hasMessageContaining("valor do pagamento deve ser exatamente igual");
     }
 }
