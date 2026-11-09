@@ -36,6 +36,13 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             return;
         }
 
+        // Verifica email_verified - obrigatório true para prosseguir
+        Boolean emailVerified = oauth2User.getAttribute("email_verified");
+        if (emailVerified == null || !emailVerified) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Email não verificado pelo provedor OAuth2");
+            return;
+        }
+
         // Verifica se o email já existe como Client
         // Comportamento: se não existe, retorna 404 com mensagem clara (não cria usuário automaticamente)
         Client client = clientRepository.findByEmail(email)

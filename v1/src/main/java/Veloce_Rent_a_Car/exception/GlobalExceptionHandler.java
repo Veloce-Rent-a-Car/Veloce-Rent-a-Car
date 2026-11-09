@@ -1,6 +1,7 @@
 package Veloce_Rent_a_Car.exception;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -27,6 +28,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({IllegalStateException.class, RegraDeNegocioException.class})
     public ResponseEntity<ErrorResponse> handleConflict(RuntimeException ex, WebRequest req) {
         return buildError(HttpStatus.CONFLICT, ex.getMessage(), req);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex, WebRequest req) {
+        String msg = ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : ex.getMessage();
+        if (msg != null && (msg.contains("cpf") || msg.contains("placa") || msg.contains("unique") || msg.contains("duplicate"))) {
+            return buildError(HttpStatus.CONFLICT, "Registro duplicado: " + msg, req);
+        }
+        return buildError(HttpStatus.CONFLICT, "Violação de integridade: " + msg, req);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

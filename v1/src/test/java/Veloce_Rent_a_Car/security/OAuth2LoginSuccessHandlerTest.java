@@ -84,20 +84,14 @@ class OAuth2LoginSuccessHandlerTest {
     }
 
     @Test
-    void onAuthenticationSuccess_emailVerifiedFalse_retornaJwt() throws Exception {
-        // Arrange - email_verified = false ainda deve gerar token (política de negócio)
+    void onAuthenticationSuccess_emailVerifiedFalse_retorna403() throws Exception {
+        // Arrange - email_verified = false deve rejeitar com 403
         String email = "usuario@gmail.com";
-        String token = "eyJhbG...oken";
-
-        Client client = new Client();
-        client.setEmail(email);
 
         Map<String, Object> attributes = Map.of("email", email, "email_verified", false);
         OAuth2User oauth2User = new DefaultOAuth2User(Collections.emptyList(), attributes, "email");
         Authentication authentication = mock(Authentication.class);
         when(authentication.getPrincipal()).thenReturn(oauth2User);
-        when(clientRepository.findByEmail(email)).thenReturn(Optional.of(client));
-        when(jwtTokenProvider.generateTokenFromEmail(email)).thenReturn(token);
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -106,8 +100,9 @@ class OAuth2LoginSuccessHandlerTest {
         successHandler.onAuthenticationSuccess(request, response, authentication);
 
         // Assert
-        assertThat(response.getStatus()).isEqualTo(200);
-        assertThat(response.getContentAsString()).isEqualTo("{\"token\":\"eyJhbG...oken\",\"type\":\"Bearer\"}");
-        verify(clientRepository).findByEmail(email);
+        assertThat(response.getStatus()).isEqualTo(403);
+        assertThat(response.getErrorMessage()).isEqualTo("Email não verificado pelo provedor OAuth2");
+        verify(jwtTokenProvider, never()).generateTokenFromEmail(anyString());
+        verify(clientRepository, never()).findByEmail(anyString());
     }
 }

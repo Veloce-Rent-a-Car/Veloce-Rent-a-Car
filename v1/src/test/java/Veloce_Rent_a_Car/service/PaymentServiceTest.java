@@ -90,6 +90,7 @@ class PaymentServiceTest {
         RentModel rent = new RentModel();
         rent.setId(1L);
         rent.setRentValue(new BigDecimal("300.00"));
+        rent.setStatus(RentModel.RentStatus.PENDING);
 
         NewPaymentDTO dto = new NewPaymentDTO();
         dto.setRentId(1L);
@@ -103,6 +104,7 @@ class PaymentServiceTest {
             p.setId(10L);
             return p;
         });
+        when(rentRepository.save(any(RentModel.class))).thenAnswer(inv -> inv.getArgument(0));
 
         Payment result = paymentService.create(dto);
 
@@ -113,6 +115,34 @@ class PaymentServiceTest {
         assertThat(result.getStatus()).isEqualTo(StatusPagamento.APROVADO);
         assertThat(result.getDataPagamento()).isNotNull();
         verify(paymentRepository).save(any(Payment.class));
+        verify(rentRepository).save(rent);
+    }
+
+    @Test
+    void create_whenValid_updatesRentStatusToConfirmado() {
+        RentModel rent = new RentModel();
+        rent.setId(1L);
+        rent.setRentValue(new BigDecimal("300.00"));
+        rent.setStatus(RentModel.RentStatus.PENDING);
+
+        NewPaymentDTO dto = new NewPaymentDTO();
+        dto.setRentId(1L);
+        dto.setValorPago(new BigDecimal("300.00"));
+        dto.setMetodoPagamento(MetodoPagamento.PIX);
+
+        when(rentRepository.findById(1L)).thenReturn(Optional.of(rent));
+        when(paymentRepository.existsByRentIdAndStatus(1L, StatusPagamento.APROVADO)).thenReturn(false);
+        when(paymentRepository.save(any(Payment.class))).thenAnswer(inv -> {
+            Payment p = inv.getArgument(0);
+            p.setId(10L);
+            return p;
+        });
+        when(rentRepository.save(any(RentModel.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        paymentService.create(dto);
+
+        assertThat(rent.getStatus()).isEqualTo(RentModel.RentStatus.CONFIRMED);
+        verify(rentRepository).save(rent);
     }
 
     @Test

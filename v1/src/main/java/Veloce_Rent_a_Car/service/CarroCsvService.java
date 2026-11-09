@@ -4,6 +4,7 @@ import Veloce_Rent_a_Car.models.Carro;
 import Veloce_Rent_a_Car.repositories.CarroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -21,6 +22,8 @@ public class CarroCsvService {
 
     @Autowired
     private CarroRepository carroRepository;
+
+    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
     public void exportarParaCsv(Path caminhoArquivo) throws IOException {
         List<Carro> carros = carroRepository.findAll();
@@ -44,6 +47,12 @@ public class CarroCsvService {
     }
 
     public int importarDeCsv(Path caminhoArquivo) throws IOException {
+        // Limite de tamanho do arquivo
+        long fileSize = Files.size(caminhoArquivo);
+        if (fileSize > MAX_FILE_SIZE) {
+            throw new IOException("Arquivo excede o tamanho máximo de " + (MAX_FILE_SIZE / 1024 / 1024) + " MB");
+        }
+
         Set<String> placasExistentes = carroRepository.findAll().stream()
                 .map(Carro::getPlaca)
                 .collect(Collectors.toSet());
@@ -72,9 +81,9 @@ public class CarroCsvService {
 
                 try {
                     Carro carro = new Carro();
-                    carro.setModelo(campos[1].trim());
+                    carro.setModelo(unescapeCsv(campos[1].trim()));
                     carro.setPlaca(placa);
-                    carro.setCategoria(campos[3].trim());
+                    carro.setCategoria(unescapeCsv(campos[3].trim()));
                     carro.setValorDaDiaria(new BigDecimal(campos[4].trim()));
                     carro.setStatusDisponibilidade(Carro.StatusCarro.valueOf(campos[5].trim()));
 
@@ -93,15 +102,30 @@ public class CarroCsvService {
     private String escapeCsv(String valor) {
         if (valor == null) return "";
         String escaped = valor;
-        // Proteção contra CSV Injection: prefixar com ' se começar com = + - @
-        if (escaped.startsWith("=") || escaped.startsWith("+") || escaped.startsWith("-") || escaped.startsWith("@")) {
-            escaped = "'" + escaped;
-        }
         // Escape de aspas e vírgulas
         if (escaped.contains(",") || escaped.contains("\"") || escaped.contains("\n")) {
             escaped = "\"" + escaped.replace("\"", "\"\"") + "\"";
         }
+        // Proteção contra CSV Injection: prefixar com ' se começar com = + - @
+        if (escaped.startsWith("=") || escaped.startsWith("+") || escaped.startsWith("-") || escaped.startsWith("@")) {
+            escaped = "'" + escaped;
+        }
         return escaped;
+    }
+
+    private String unescapeCsv(String valor) {
+        if (valor == null) return "";
+        String unescaped = valor.trim();
+        // Remove aspas externas se existirem
+        if (unescaped.startsWith("\"") && unescaped.endsWith("\"") && unescaped.length() >= 2) {
+            unescaped = unescaped.substring(1, unescaped.length() - 1);
+            unescaped = unescaped.replace("\"\"", "\"");
+        }
+        // Remove prefixo ' de proteção contra CSV injection
+        if (unescaped.startsWith("'")) {
+            unescaped = unescaped.substring(1);
+        }
+        return unescaped;
     }
 
     private String[] parseCsvLine(String line) {
