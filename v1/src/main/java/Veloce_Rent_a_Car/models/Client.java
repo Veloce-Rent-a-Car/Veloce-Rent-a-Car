@@ -57,14 +57,6 @@ public class Client {
         this.name = name;
     }
 
-    public String getNome() {
-        return name;
-    }
-
-    public void setNome(String nome) {
-        this.name = nome;
-    }
-
     public String getCpf() {
         return cpf;
     }
@@ -81,14 +73,6 @@ public class Client {
         this.phone = phone;
     }
 
-    public String getTelefone() {
-        return phone;
-    }
-
-    public void setTelefone(String telefone) {
-        this.phone = telefone;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -103,14 +87,6 @@ public class Client {
 
     public void setAddress(String address) {
         this.address = address;
-    }
-
-    public String getEndereco() {
-        return address;
-    }
-
-    public void setEndereco(String endereco) {
-        this.address = endereco;
     }
 
     public String getPassword() {

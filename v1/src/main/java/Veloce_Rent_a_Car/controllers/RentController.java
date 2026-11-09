@@ -2,6 +2,8 @@
 package Veloce_Rent_a_Car.controllers;
 
 import Veloce_Rent_a_Car.dto.NewRentDTO;
+import Veloce_Rent_a_Car.models.Carro;
+import Veloce_Rent_a_Car.models.Client;
 import Veloce_Rent_a_Car.models.RentModel;
 import Veloce_Rent_a_Car.services.RentService;
 
@@ -10,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/rentals")
@@ -35,6 +38,16 @@ public class RentController {
         List<RentModel> rents = rentService.findByClient(clientId);
 
         return ResponseEntity.ok(rents);
+    }
+
+    @GetMapping("/report/by-client")
+    public ResponseEntity<Map<Client, List<RentModel>>> relatorioPorCliente() {
+        return ResponseEntity.ok(rentService.relatorioPorCliente());
+    }
+
+    @GetMapping("/report/by-car")
+    public ResponseEntity<Map<Carro, List<RentModel>>> relatorioPorCarro() {
+        return ResponseEntity.ok(rentService.relatorioPorCarro());
     }
 
     @PostMapping

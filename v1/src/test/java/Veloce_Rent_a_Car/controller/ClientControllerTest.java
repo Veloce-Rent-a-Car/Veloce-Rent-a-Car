@@ -82,7 +82,7 @@ class ClientControllerTest {
 
     @Test
     @WithMockUser
-    void createClient_whenCpfExists_returnsBadRequest() throws Exception {
+    void createClient_whenCpfExists_returnsConflict() throws Exception {
         Client client1 = createTestClient(
                 "João",
                 "11111111111",
@@ -104,7 +104,7 @@ class ClientControllerTest {
         mockMvc.perform(post("/api/clients")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(client2)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isConflict());
     }
 
     @Test

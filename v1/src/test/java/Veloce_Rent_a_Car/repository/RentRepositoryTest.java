@@ -1,6 +1,7 @@
 package Veloce_Rent_a_Car.repository;
 
 import Veloce_Rent_a_Car.dto.NewRentDTO;
+import Veloce_Rent_a_Car.exception.RecursoNaoEncontradoException;
 import Veloce_Rent_a_Car.models.Carro;
 import Veloce_Rent_a_Car.models.Client;
 import Veloce_Rent_a_Car.models.RentModel;
@@ -8,8 +9,6 @@ import Veloce_Rent_a_Car.repositories.CarroRepository;
 import Veloce_Rent_a_Car.repositories.ClientRepository;
 import Veloce_Rent_a_Car.repositories.RentRepository;
 import Veloce_Rent_a_Car.services.RentService;
-
-import jakarta.persistence.EntityNotFoundException;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -71,12 +70,12 @@ class RentRepositoryTest {
     }
 
     @Test
-    void findById_whenNotExists_throwsEntityNotFoundException() {
+    void findById_whenNotExists_throwsRecursoNaoEncontradoException() {
         when(rentRepository.findById(999L))
                 .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> rentService.findById(999L))
-                .isInstanceOf(EntityNotFoundException.class)
+                .isInstanceOf(RecursoNaoEncontradoException.class)
                 .hasMessageContaining(
                         "Aluguel nao encontrado com id: 999"
                 );
@@ -179,7 +178,7 @@ class RentRepositoryTest {
     }
 
     @Test
-    void create_whenClientNotExists_throwsEntityNotFoundException() {
+    void create_whenClientNotExists_throwsRecursoNaoEncontradoException() {
         NewRentDTO dto = new NewRentDTO();
 
         dto.setClientCpf("99999999999");
@@ -189,7 +188,7 @@ class RentRepositoryTest {
                 .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> rentService.create(dto))
-                .isInstanceOf(EntityNotFoundException.class)
+                .isInstanceOf(RecursoNaoEncontradoException.class)
                 .hasMessageContaining(
                         "Cliente nao encontrado com CPF: 99999999999"
                 );

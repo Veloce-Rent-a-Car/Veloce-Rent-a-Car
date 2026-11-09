@@ -2,6 +2,7 @@
 package Veloce_Rent_a_Car.service;
 
 import Veloce_Rent_a_Car.dto.NewRentDTO;
+import Veloce_Rent_a_Car.exception.RecursoNaoEncontradoException;
 import Veloce_Rent_a_Car.models.Carro;
 import Veloce_Rent_a_Car.models.Client;
 import Veloce_Rent_a_Car.models.RentModel;
@@ -9,8 +10,6 @@ import Veloce_Rent_a_Car.repositories.CarroRepository;
 import Veloce_Rent_a_Car.repositories.ClientRepository;
 import Veloce_Rent_a_Car.repositories.RentRepository;
 import Veloce_Rent_a_Car.services.RentService;
-
-import jakarta.persistence.EntityNotFoundException;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,12 +71,12 @@ class RentServiceTest {
     }
 
     @Test
-    void findById_whenNotExists_throwsEntityNotFoundException() {
+    void findById_whenNotExists_throwsRecursoNaoEncontradoException() {
         when(rentRepository.findById(999L))
                 .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> rentService.findById(999L))
-                .isInstanceOf(EntityNotFoundException.class)
+                .isInstanceOf(RecursoNaoEncontradoException.class)
                 .hasMessageContaining(
                         "Aluguel nao encontrado com id: 999"
                 );
@@ -181,7 +180,7 @@ class RentServiceTest {
     }
 
     @Test
-    void create_whenClientNotExists_throwsEntityNotFoundException() {
+    void create_whenClientNotExists_throwsRecursoNaoEncontradoException() {
         NewRentDTO dto = new NewRentDTO();
 
         dto.setClientCpf("99999999999");
@@ -191,7 +190,7 @@ class RentServiceTest {
                 .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> rentService.create(dto))
-                .isInstanceOf(EntityNotFoundException.class)
+                .isInstanceOf(RecursoNaoEncontradoException.class)
                 .hasMessageContaining(
                         "Cliente nao encontrado com CPF: 99999999999"
                 );
@@ -223,5 +222,81 @@ class RentServiceTest {
                 .isEqualTo(RentModel.RentStatus.CONFIRMED);
 
         verify(rentRepository).save(rent);
+    }
+
+    @Test
+    void relatorioPorCliente_agrupaAlugueisPorCliente() {
+        // Arrange
+        Client client1 = new Client("João", "11111111111", "11999999999", "joao@email.com", "SP");
+        client1.setId(1L);
+        Client client2 = new Client("Maria", "22222222222", "11888888888", "maria@email.com", "RJ");
+        client2.setId(2L);
+
+        Carro car = new Carro("Civic", "ABC1234", "sedan", new BigDecimal("300.00"), Carro.StatusCarro.DISPONIVEL);
+        car.setId(10L);
+
+        RentModel rent1 = new RentModel();
+        rent1.setId(1L);
+        rent1.setClient(client1);
+        rent1.setCar(car);
+
+        RentModel rent2 = new RentModel();
+        rent2.setId(2L);
+        rent2.setClient(client1);
+        rent2.setCar(car);
+
+        RentModel rent3 = new RentModel();
+        rent3.setId(3L);
+        rent3.setClient(client2);
+        rent3.setCar(car);
+
+        when(rentRepository.findAll()).thenReturn(List.of(rent1, rent2, rent3));
+
+        // Act
+        var relatorio = rentService.relatorioPorCliente();
+
+        // Assert
+        assertThat(relatorio).hasSize(2);
+        assertThat(relatorio.get(client1)).hasSize(2);
+        assertThat(relatorio.get(client2)).hasSize(1);
+        verify(rentRepository).findAll();
+    }
+
+    @Test
+    void relatorioPorCarro_agrupaAlugueisPorCarro() {
+        // Arrange
+        Client client = new Client("João", "11111111111", "11999999999", "joao@email.com", "SP");
+        client.setId(1L);
+
+        Carro car1 = new Carro("Civic", "ABC1234", "sedan", new BigDecimal("300.00"), Carro.StatusCarro.DISPONIVEL);
+        car1.setId(10L);
+        Carro car2 = new Carro("Corolla", "XYZ7890", "sedan", new BigDecimal("280.00"), Carro.StatusCarro.DISPONIVEL);
+        car2.setId(20L);
+
+        RentModel rent1 = new RentModel();
+        rent1.setId(1L);
+        rent1.setClient(client);
+        rent1.setCar(car1);
+
+        RentModel rent2 = new RentModel();
+        rent2.setId(2L);
+        rent2.setClient(client);
+        rent2.setCar(car1);
+
+        RentModel rent3 = new RentModel();
+        rent3.setId(3L);
+        rent3.setClient(client);
+        rent3.setCar(car2);
+
+        when(rentRepository.findAll()).thenReturn(List.of(rent1, rent2, rent3));
+
+        // Act
+        var relatorio = rentService.relatorioPorCarro();
+
+        // Assert
+        assertThat(relatorio).hasSize(2);
+        assertThat(relatorio.get(car1)).hasSize(2);
+        assertThat(relatorio.get(car2)).hasSize(1);
+        verify(rentRepository).findAll();
     }
 }

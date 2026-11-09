@@ -2,7 +2,6 @@ package Veloce_Rent_a_Car.config;
 
 import Veloce_Rent_a_Car.security.CustomUserDetailsService;
 import Veloce_Rent_a_Car.security.JwtAuthenticationFilter;
-import Veloce_Rent_a_Car.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,6 +41,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/carros/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/rentals/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/payments/**").permitAll()
+                        .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

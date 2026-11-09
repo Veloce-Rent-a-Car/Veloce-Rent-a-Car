@@ -90,7 +90,7 @@ class CarroControllerTest {
 
     @Test
     @WithMockUser
-    void criar_whenPlacaExists_returnsBadRequest() throws Exception {
+    void criar_whenPlacaExists_returnsConflict() throws Exception {
         createCarro(
                 "Civic",
                 "AAA1111",
@@ -110,7 +110,7 @@ class CarroControllerTest {
         mockMvc.perform(post("/api/carros")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(duplicate)))
-                .andExpect(status().is5xxServerError());
+                .andExpect(status().isConflict());
     }
 
     @Test
