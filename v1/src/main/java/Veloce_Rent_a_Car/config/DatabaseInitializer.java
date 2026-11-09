@@ -1,6 +1,7 @@
 package Veloce_Rent_a_Car.config;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -8,6 +9,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
+@Profile("!test")
 public class DatabaseInitializer implements CommandLineRunner {
 
     private final DataSource dataSource;
