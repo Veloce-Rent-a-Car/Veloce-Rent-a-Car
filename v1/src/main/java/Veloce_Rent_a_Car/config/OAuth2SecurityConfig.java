@@ -3,6 +3,7 @@ package Veloce_Rent_a_Car.config;
 import Veloce_Rent_a_Car.repositories.ClientRepository;
 import Veloce_Rent_a_Car.security.JwtTokenProvider;
 import Veloce_Rent_a_Car.security.OAuth2LoginSuccessHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,9 @@ import org.springframework.security.web.SecurityFilterChain;
 @ConditionalOnProperty(name = "spring.security.oauth2.client.registration.google.client-id")
 public class OAuth2SecurityConfig {
 
+    @Autowired
+    private CorsConfig corsConfig;
+
     @Bean
     public OAuth2LoginSuccessHandler oauth2LoginSuccessHandler(JwtTokenProvider jwtTokenProvider, ClientRepository clientRepository) {
         return new OAuth2LoginSuccessHandler(jwtTokenProvider, clientRepository);
@@ -23,6 +27,7 @@ public class OAuth2SecurityConfig {
     @Bean
     public SecurityFilterChain oauth2SecurityFilterChain(HttpSecurity http, OAuth2LoginSuccessHandler oauth2LoginSuccessHandler) throws Exception {
         http
+                .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
                 .securityMatcher("/oauth2/**", "/login/oauth2/**")
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .oauth2Login(oauth2 -> oauth2
