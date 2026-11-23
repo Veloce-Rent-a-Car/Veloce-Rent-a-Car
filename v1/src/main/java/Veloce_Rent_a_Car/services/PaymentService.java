@@ -1,6 +1,7 @@
 package Veloce_Rent_a_Car.services;
 
 import Veloce_Rent_a_Car.dto.NewPaymentDTO;
+import Veloce_Rent_a_Car.events.PaymentApprovedEvent;
 import Veloce_Rent_a_Car.exception.RecursoNaoEncontradoException;
 import Veloce_Rent_a_Car.exception.RegraDeNegocioException;
 import Veloce_Rent_a_Car.exception.ValidacaoException;
@@ -11,6 +12,7 @@ import Veloce_Rent_a_Car.repositories.PaymentRepository;
 import Veloce_Rent_a_Car.repositories.RentRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,6 +26,9 @@ public class PaymentService {
 
     @Autowired
     private RentRepository rentRepository;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     public List<Payment> findAll() {
         return paymentRepository.findAll();
@@ -59,10 +64,7 @@ public class PaymentService {
                 .build();
 
         Payment saved = paymentRepository.save(payment);
-
-        // Atualiza status do aluguel para CONFIRMED quando pagamento é aprovado
-        rent.setStatus(RentModel.RentStatus.CONFIRMED);
-        rentRepository.save(rent);
+        eventPublisher.publishEvent(new PaymentApprovedEvent(saved));
 
         return saved;
     }

@@ -140,6 +140,7 @@ class PaymentControllerTest {
                         "$.rent.id",
                         is(rent.getId().intValue())
                 ))
+                .andExpect(jsonPath("$.rent.status", is("CONFIRMED")))
                 .andExpect(jsonPath("$.valorPago", is(300.00)))
                 .andExpect(jsonPath("$.metodoPagamento", is("PIX")))
                 .andExpect(jsonPath("$.status", is("APROVADO")))
