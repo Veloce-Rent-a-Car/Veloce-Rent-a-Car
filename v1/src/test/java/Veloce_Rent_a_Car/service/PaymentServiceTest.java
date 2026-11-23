@@ -1,6 +1,7 @@
 package Veloce_Rent_a_Car.service;
 
 import Veloce_Rent_a_Car.dto.NewPaymentDTO;
+import Veloce_Rent_a_Car.events.PaymentApprovedEvent;
 import Veloce_Rent_a_Car.exception.RecursoNaoEncontradoException;
 import Veloce_Rent_a_Car.exception.RegraDeNegocioException;
 import Veloce_Rent_a_Car.exception.ValidacaoException;
@@ -14,9 +15,11 @@ import Veloce_Rent_a_Car.services.PaymentService;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -36,6 +39,9 @@ class PaymentServiceTest {
 
     @Mock
     private RentRepository rentRepository;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private PaymentService paymentService;
@@ -104,7 +110,6 @@ class PaymentServiceTest {
             p.setId(10L);
             return p;
         });
-        when(rentRepository.save(any(RentModel.class))).thenAnswer(inv -> inv.getArgument(0));
 
         Payment result = paymentService.create(dto);
 
@@ -115,11 +120,11 @@ class PaymentServiceTest {
         assertThat(result.getStatus()).isEqualTo(StatusPagamento.APROVADO);
         assertThat(result.getDataPagamento()).isNotNull();
         verify(paymentRepository).save(any(Payment.class));
-        verify(rentRepository).save(rent);
+        verify(rentRepository, never()).save(any(RentModel.class));
     }
 
     @Test
-    void create_whenValid_updatesRentStatusToConfirmado() {
+    void create_whenValid_publishesPaymentApprovedEventForSavedPayment() {
         RentModel rent = new RentModel();
         rent.setId(1L);
         rent.setRentValue(new BigDecimal("300.00"));
@@ -137,12 +142,14 @@ class PaymentServiceTest {
             p.setId(10L);
             return p;
         });
-        when(rentRepository.save(any(RentModel.class))).thenAnswer(inv -> inv.getArgument(0));
 
         paymentService.create(dto);
 
-        assertThat(rent.getStatus()).isEqualTo(RentModel.RentStatus.CONFIRMED);
-        verify(rentRepository).save(rent);
+        ArgumentCaptor<PaymentApprovedEvent> captor = ArgumentCaptor.forClass(PaymentApprovedEvent.class);
+        verify(eventPublisher).publishEvent(captor.capture());
+        PaymentApprovedEvent event = captor.getValue();
+        assertThat(event.payment().getId()).isEqualTo(10L);
+        assertThat(event.payment().getRent()).isSameAs(rent);
     }
 
     @Test

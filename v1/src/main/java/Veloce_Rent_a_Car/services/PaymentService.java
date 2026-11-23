@@ -1,6 +1,7 @@
 package Veloce_Rent_a_Car.services;
 
 import Veloce_Rent_a_Car.dto.NewPaymentDTO;
+import Veloce_Rent_a_Car.events.PaymentApprovedEvent;
 import Veloce_Rent_a_Car.exception.RecursoNaoEncontradoException;
 import Veloce_Rent_a_Car.exception.RegraDeNegocioException;
 import Veloce_Rent_a_Car.exception.ValidacaoException;
@@ -11,11 +12,16 @@ import Veloce_Rent_a_Car.repositories.PaymentRepository;
 import Veloce_Rent_a_Car.repositories.RentRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Gerencia a consulta e o registro de pagamentos vinculados aos aluguéis, incluindo a
+ * publicação de evento quando um novo pagamento é aprovado.
+ */
 @Service
 public class PaymentService {
 
@@ -25,19 +31,51 @@ public class PaymentService {
     @Autowired
     private RentRepository rentRepository;
 
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
+    /**
+     * Recupera todos os pagamentos persistidos.
+     *
+     * @return lista com todos os pagamentos cadastrados
+     */
     public List<Payment> findAll() {
         return paymentRepository.findAll();
     }
 
+    /**
+     * Localiza um pagamento pelo seu identificador.
+     *
+     * @param id identificador do pagamento
+     * @return pagamento correspondente ao identificador
+     * @throws RecursoNaoEncontradoException se o pagamento não existir
+     */
     public Payment findById(Long id) {
         return paymentRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Pagamento nao encontrado com id: " + id));
     }
 
+    /**
+     * Recupera os pagamentos associados a um aluguel.
+     *
+     * @param rentId identificador do aluguel
+     * @return lista de pagamentos vinculados ao aluguel informado
+     */
     public List<Payment> findByRentId(Long rentId) {
         return paymentRepository.findByRentId(rentId);
     }
 
+    /**
+     * Registra um pagamento aprovado com a data atual, exigindo que o aluguel exista, ainda não
+     * tenha pagamento aprovado e receba exatamente o valor do aluguel. Após persistir, publica
+     * um {@link PaymentApprovedEvent} com o pagamento salvo.
+     *
+     * @param dto dados do aluguel, valor e método do pagamento
+     * @return pagamento persistido com status {@code APROVADO}
+     * @throws RecursoNaoEncontradoException se o aluguel informado não existir
+     * @throws RegraDeNegocioException se o aluguel já possuir pagamento aprovado
+     * @throws ValidacaoException se o valor for nulo ou diferente do valor do aluguel
+     */
     public Payment create(NewPaymentDTO dto) {
         RentModel rent = rentRepository.findById(dto.getRentId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Aluguel nao encontrado com id: " + dto.getRentId()));
@@ -50,18 +88,16 @@ public class PaymentService {
             throw new ValidacaoException("O valor do pagamento deve ser exatamente igual ao valor do aluguel.");
         }
 
-        Payment payment = new Payment();
-        payment.setRent(rent);
-        payment.setValorPago(dto.getValorPago());
-        payment.setDataPagamento(LocalDateTime.now());
-        payment.setMetodoPagamento(dto.getMetodoPagamento());
-        payment.setStatus(StatusPagamento.APROVADO);
+        Payment payment = Payment.builder()
+                .rent(rent)
+                .valorPago(dto.getValorPago())
+                .dataPagamento(LocalDateTime.now())
+                .metodoPagamento(dto.getMetodoPagamento())
+                .status(StatusPagamento.APROVADO)
+                .build();
 
         Payment saved = paymentRepository.save(payment);
-
-        // Atualiza status do aluguel para CONFIRMED quando pagamento é aprovado
-        rent.setStatus(RentModel.RentStatus.CONFIRMED);
-        rentRepository.save(rent);
+        eventPublisher.publishEvent(new PaymentApprovedEvent(saved));
 
         return saved;
     }

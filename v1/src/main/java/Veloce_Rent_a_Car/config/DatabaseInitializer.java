@@ -8,16 +8,32 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Statement;
 
+/**
+ * Inicializador executado fora do perfil de teste para verificar e, se necessário,
+ * criar o banco PostgreSQL {@code carrental} durante a inicialização da aplicação.
+ */
 @Component
 @Profile("!test")
 public class DatabaseInitializer implements CommandLineRunner {
 
     private final DataSource dataSource;
 
+    /**
+     * Cria o inicializador com a fonte de conexões usada para acessar o PostgreSQL.
+     *
+     * @param dataSource fonte de conexões configurada para a aplicação
+     */
     public DatabaseInitializer(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
+    /**
+     * Executa um bloco PostgreSQL que cria o banco {@code carrental} somente quando
+     * ele ainda não existe. Falhas de conexão ou de SQL são registradas no erro padrão
+     * e não são propagadas por esta implementação.
+     *
+     * @param args argumentos recebidos na inicialização, não utilizados neste método
+     */
     @Override
     public void run(String... args) throws Exception {
         try (Connection conn = dataSource.getConnection();

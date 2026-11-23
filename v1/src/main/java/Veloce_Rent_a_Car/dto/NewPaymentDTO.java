@@ -5,6 +5,10 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 
+/**
+ * Transporta os dados para registrar um pagamento: o identificador do aluguel,
+ * o valor pago e o método de pagamento utilizado.
+ */
 @Data
 public class NewPaymentDTO {
     private Long rentId;

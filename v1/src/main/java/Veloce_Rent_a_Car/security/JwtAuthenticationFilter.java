@@ -16,6 +16,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * Extrai o token Bearer de cada requisição, valida o usuário correspondente e registra sua
+ * autenticação no contexto do Spring Security antes de continuar a cadeia de filtros.
+ */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 

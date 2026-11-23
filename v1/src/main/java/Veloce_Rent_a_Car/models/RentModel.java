@@ -2,13 +2,18 @@ package Veloce_Rent_a_Car.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * Entidade que representa o aluguel de um carro por um cliente.
+ */
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -40,11 +45,19 @@ public class RentModel {
     @Column(nullable = false)
     private RentStatus status;
 
+    /**
+     * Etapas do ciclo de vida de um aluguel.
+     */
     public enum RentStatus {
+        /** Aluguel aguardando confirmação. */
         PENDING,
+        /** Aluguel confirmado. */
         CONFIRMED,
+        /** Aluguel em andamento. */
         ACTIVE,
+        /** Aluguel concluído. */
         FINISHED,
+        /** Aluguel cancelado. */
         CANCELLED
     }
 }

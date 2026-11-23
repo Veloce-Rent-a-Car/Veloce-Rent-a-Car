@@ -1,112 +1,69 @@
 package Veloce_Rent_a_Car.controllers;
 
+import Veloce_Rent_a_Car.dto.LoginRequest;
+import Veloce_Rent_a_Car.dto.RegisterRequest;
 import Veloce_Rent_a_Car.models.Client;
-import Veloce_Rent_a_Car.security.JwtTokenProvider;
-import Veloce_Rent_a_Car.services.ClientService;
+import Veloce_Rent_a_Car.services.AuthFacade;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+/**
+ * Expõe os endpoints de autenticação por CPF e senha e de cadastro de clientes
+ * sob o caminho base {@code /api/auth}.
+ */
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthFacade authFacade;
 
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    /**
+     * Cria o controlador com a fachada responsável pelas operações de autenticação e registro.
+     *
+     * @param authFacade fachada de autenticação e cadastro de clientes
+     */
+    public AuthController(AuthFacade authFacade) {
+        this.authFacade = authFacade;
+    }
 
-    @Autowired
-    private ClientService clientService;
-
+    /**
+     * Autentica as credenciais recebidas e devolve o token gerado pela fachada.
+     * Credenciais inválidas são convertidas em uma resposta de não autorizado.
+     *
+     * @param request CPF e senha enviados para autenticação
+     * @return resposta HTTP 200 com token e tipo {@code Bearer}, ou HTTP 401 com mensagem de credenciais inválidas
+     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getCpf(), request.getPassword())
-            );
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            String token = jwtTokenProvider.generateToken(userDetails);
+            String token = authFacade.autenticar(request);
             return ResponseEntity.ok(Map.of("token", token, "type", "Bearer"));
-        } catch (Exception e) {
+        } catch (BadCredentialsException e) {
             return ResponseEntity.status(401).body(Map.of("error", "Credenciais inválidas"));
         }
     }
 
+    /**
+     * Registra um cliente com dados previamente validados e devolve seu identificador.
+     * Uma tentativa de registro em estado inválido resulta em resposta de requisição inválida.
+     *
+     * @param request dados validados para o cadastro do cliente
+     * @return resposta HTTP 200 com mensagem de sucesso e ID do cliente, ou HTTP 400 com o erro informado pela fachada
+     */
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         try {
-            Client client = new Client();
-            client.setName(request.getNome());
-            client.setCpf(request.getCpf());
-            client.setPhone(request.getTelefone());
-            client.setEmail(request.getEmail());
-            client.setAddress(request.getEndereco());
-            client.setPassword(request.getPassword());
-
-            Client saved = clientService.create(client);
+            Client saved = authFacade.registrar(request);
             return ResponseEntity.ok(Map.of("message", "Cliente cadastrado com sucesso", "id", saved.getId()));
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
-    }
-
-    public static class LoginRequest {
-        private String cpf;
-        private String password;
-
-        public String getCpf() { return cpf; }
-        public void setCpf(String cpf) { this.cpf = cpf; }
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
-    }
-
-    public static class RegisterRequest {
-        @NotBlank(message = "Nome é obrigatório")
-        @Size(max = 100, message = "Nome deve ter no máximo 100 caracteres")
-        private String nome;
-
-        @NotBlank(message = "CPF é obrigatório")
-        @Size(min = 11, max = 11, message = "CPF deve ter 11 dígitos")
-        private String cpf;
-
-        @NotBlank(message = "Telefone é obrigatório")
-        @Size(max = 20, message = "Telefone deve ter no máximo 20 caracteres")
-        private String telefone;
-
-        @NotBlank(message = "Email é obrigatório")
-        @Email(message = "Email inválido")
-        private String email;
-
-        @Size(max = 200, message = "Endereço deve ter no máximo 200 caracteres")
-        private String endereco;
-
-        @NotBlank(message = "Senha é obrigatória")
-        @Size(min = 6, message = "Senha deve ter no mínimo 6 caracteres")
-        private String password;
-
-        public String getNome() { return nome; }
-        public void setNome(String nome) { this.nome = nome; }
-        public String getCpf() { return cpf; }
-        public void setCpf(String cpf) { this.cpf = cpf; }
-        public String getTelefone() { return telefone; }
-        public void setTelefone(String telefone) { this.telefone = telefone; }
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-        public String getEndereco() { return endereco; }
-        public void setEndereco(String endereco) { this.endereco = endereco; }
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
     }
 }
