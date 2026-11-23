@@ -80,12 +80,13 @@ public class CarroCsvService {
                 }
 
                 try {
-                    Carro carro = new Carro();
-                    carro.setModelo(unescapeCsv(campos[1].trim()));
-                    carro.setPlaca(placa);
-                    carro.setCategoria(unescapeCsv(campos[3].trim()));
-                    carro.setValorDaDiaria(new BigDecimal(campos[4].trim()));
-                    carro.setStatusDisponibilidade(Carro.StatusCarro.valueOf(campos[5].trim()));
+                    Carro carro = Carro.builder()
+                            .modelo(unescapeCsv(campos[1].trim()))
+                            .placa(placa)
+                            .categoria(unescapeCsv(campos[3].trim()))
+                            .valorDaDiaria(new BigDecimal(campos[4].trim()))
+                            .statusDisponibilidade(Carro.StatusCarro.valueOf(campos[5].trim()))
+                            .build();
 
                     carroRepository.save(carro);
                     placasExistentes.add(placa);

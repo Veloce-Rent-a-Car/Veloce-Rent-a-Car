@@ -86,13 +86,13 @@ public class RentService {
     }
 
     private RentModel buildRentModel(Client client, Carro carro, NewRentDTO dto) {
-        RentModel rent = new RentModel();
-        rent.setClient(client);
-        rent.setCar(carro);
-        rent.setRentValue(dto.getRentValue());
-        rent.setStartDate(LocalDateTime.now());
-        rent.setStatus(RentModel.RentStatus.PENDING);
-        return rent;
+        return RentModel.builder()
+                .client(client)
+                .car(carro)
+                .rentValue(dto.getRentValue())
+                .startDate(LocalDateTime.now())
+                .status(RentModel.RentStatus.PENDING)
+                .build();
     }
 
     private void updateCarroStatus(Carro carro, Carro.StatusCarro novoStatus) {

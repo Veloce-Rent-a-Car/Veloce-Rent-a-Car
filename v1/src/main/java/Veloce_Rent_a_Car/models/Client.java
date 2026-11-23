@@ -2,7 +2,11 @@
 package Veloce_Rent_a_Car.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 
+@Builder
+@AllArgsConstructor
 @Entity
 @Table(name = "clients")
 public class Client {

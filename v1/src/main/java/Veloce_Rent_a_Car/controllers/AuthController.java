@@ -47,13 +47,14 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         try {
-            Client client = new Client();
-            client.setName(request.getNome());
-            client.setCpf(request.getCpf());
-            client.setPhone(request.getTelefone());
-            client.setEmail(request.getEmail());
-            client.setAddress(request.getEndereco());
-            client.setPassword(request.getPassword());
+            Client client = Client.builder()
+                    .name(request.getNome())
+                    .cpf(request.getCpf())
+                    .phone(request.getTelefone())
+                    .email(request.getEmail())
+                    .address(request.getEndereco())
+                    .password(request.getPassword())
+                    .build();
 
             Client saved = clientService.create(client);
             return ResponseEntity.ok(Map.of("message", "Cliente cadastrado com sucesso", "id", saved.getId()));

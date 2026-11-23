@@ -50,12 +50,13 @@ public class PaymentService {
             throw new ValidacaoException("O valor do pagamento deve ser exatamente igual ao valor do aluguel.");
         }
 
-        Payment payment = new Payment();
-        payment.setRent(rent);
-        payment.setValorPago(dto.getValorPago());
-        payment.setDataPagamento(LocalDateTime.now());
-        payment.setMetodoPagamento(dto.getMetodoPagamento());
-        payment.setStatus(StatusPagamento.APROVADO);
+        Payment payment = Payment.builder()
+                .rent(rent)
+                .valorPago(dto.getValorPago())
+                .dataPagamento(LocalDateTime.now())
+                .metodoPagamento(dto.getMetodoPagamento())
+                .status(StatusPagamento.APROVADO)
+                .build();
 
         Payment saved = paymentRepository.save(payment);
 
