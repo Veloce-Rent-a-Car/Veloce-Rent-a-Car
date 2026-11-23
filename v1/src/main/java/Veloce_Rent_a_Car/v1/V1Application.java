@@ -10,11 +10,21 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.math.BigDecimal;
 
+/**
+ * Ponto de entrada da aplicação Spring Boot, configurado para descobrir os componentes, entidades
+ * e repositórios do projeto Veloce Rent a Car.
+ */
 @SpringBootApplication(scanBasePackages = "Veloce_Rent_a_Car")
 @EntityScan(basePackages = "Veloce_Rent_a_Car.models")
 @EnableJpaRepositories(basePackages = "Veloce_Rent_a_Car.repositories")
 public class V1Application {
 
+    /**
+     * Inicializa o contexto do Spring Boot e executa exemplos locais de validação de CPF, e-mail
+     * e placa, imprimindo os resultados no console.
+     *
+     * @param args argumentos de linha de comando repassados à inicialização do Spring Boot
+     */
     public static void main(String[] args) {
         SpringApplication.run(V1Application.class, args);
 

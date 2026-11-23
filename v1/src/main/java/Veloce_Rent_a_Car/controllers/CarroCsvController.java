@@ -14,6 +14,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * Expõe endpoints para exportar o cadastro de carros em CSV e importar carros
+ * de um arquivo CSV enviado pelo cliente, sob {@code /api/carros/csv}.
+ */
 @RestController
 @RequestMapping("/api/carros/csv")
 public class CarroCsvController {
@@ -21,6 +25,13 @@ public class CarroCsvController {
     @Autowired
     private CarroCsvService carroCsvService;
 
+    /**
+     * Exporta os carros para um arquivo CSV temporário e o disponibiliza como anexo
+     * denominado {@code carros.csv}, com conteúdo em UTF-8.
+     *
+     * @return resposta HTTP 200 contendo o recurso CSV para download
+     * @throws IOException se ocorrer falha ao criar, preencher ou abrir o arquivo temporário
+     */
     @GetMapping("/export")
     public ResponseEntity<Resource> exportarCsv() throws IOException {
         Path tempFile = Files.createTempFile("carros-", ".csv");
@@ -35,6 +46,14 @@ public class CarroCsvController {
                 .body(resource);
     }
 
+    /**
+     * Importa carros do arquivo CSV enviado, copiando-o antes para um arquivo temporário.
+     * Um upload vazio é rejeitado sem acionar o serviço de importação.
+     *
+     * @param file arquivo CSV recebido no parâmetro multipart {@code file}
+     * @return resposta HTTP 400 para arquivo vazio ou HTTP 200 com a quantidade de carros importados
+     * @throws IOException se ocorrer falha ao ler o upload ou manipular o arquivo temporário
+     */
     @PostMapping("/import")
     public ResponseEntity<String> importarCsv(@RequestParam("file") MultipartFile file) throws IOException {
         if (file.isEmpty()) {

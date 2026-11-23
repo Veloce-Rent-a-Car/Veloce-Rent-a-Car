@@ -19,6 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Coordena consultas, criação e atualização de aluguéis, além de agrupar relatórios por cliente
+ * e por carro e controlar a disponibilidade do veículo alugado.
+ */
 @Service
 public class RentService {
 
@@ -31,10 +35,22 @@ public class RentService {
     @Autowired
     private CarroRepository carroRepository;
 
+    /**
+     * Recupera todos os aluguéis persistidos.
+     *
+     * @return lista com todos os aluguéis cadastrados
+     */
     public List<RentModel> findAll() {
         return rentRepository.findAll();
     }
 
+    /**
+     * Localiza um aluguel pelo seu identificador.
+     *
+     * @param id identificador do aluguel
+     * @return aluguel correspondente ao identificador
+     * @throws RecursoNaoEncontradoException se o aluguel não existir
+     */
     public RentModel findById(Long id) {
         return rentRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
@@ -42,10 +58,25 @@ public class RentService {
                 ));
     }
 
+    /**
+     * Recupera os aluguéis vinculados ao identificador de um cliente.
+     *
+     * @param clientId identificador do cliente
+     * @return lista de aluguéis associados ao cliente
+     */
     public List<RentModel> findByClient(Long clientId) {
         return rentRepository.findByClientId(clientId);
     }
 
+    /**
+     * Cria um aluguel pendente para o CPF informado e para um carro disponível com o modelo e a
+     * categoria solicitados. Define o início no horário atual, marca o carro como alugado e
+     * executa as alterações em uma transação.
+     *
+     * @param dto dados do cliente, carro e valor do novo aluguel
+     * @return aluguel persistido com status {@code PENDING}
+     * @throws RecursoNaoEncontradoException se o cliente não existir ou não houver carro disponível compatível
+     */
     @Transactional
     public RentModel create(NewRentDTO dto) {
         Client client = findClientByCpf(dto.getClientCpf());
@@ -57,12 +88,22 @@ public class RentService {
         return rentRepository.save(rent);
     }
 
+    /**
+     * Agrupa todos os aluguéis cadastrados pelo cliente associado a cada registro.
+     *
+     * @return mapa de cada cliente para sua lista de aluguéis
+     */
     public Map<Client, List<RentModel>> relatorioPorCliente() {
         List<RentModel> todos = rentRepository.findAll();
         return todos.stream()
                 .collect(Collectors.groupingBy(RentModel::getClient));
     }
 
+    /**
+     * Agrupa todos os aluguéis cadastrados pelo carro associado a cada registro.
+     *
+     * @return mapa de cada carro para sua lista de aluguéis
+     */
     public Map<Carro, List<RentModel>> relatorioPorCarro() {
         List<RentModel> todos = rentRepository.findAll();
         return todos.stream()
@@ -100,6 +141,14 @@ public class RentService {
         carroRepository.save(carro);
     }
 
+    /**
+     * Atualiza somente o status de um aluguel existente e persiste a alteração.
+     *
+     * @param id identificador do aluguel
+     * @param status novo status do aluguel
+     * @return aluguel persistido com o status atualizado
+     * @throws RecursoNaoEncontradoException se o aluguel não existir
+     */
     public RentModel updateStatus(Long id, RentModel.RentStatus status) {
         RentModel rent = findById(id);
         rent.setStatus(status);

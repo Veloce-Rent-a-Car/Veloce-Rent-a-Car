@@ -17,6 +17,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Exporta o cadastro de carros para CSV e importa novos registros com validação de tamanho,
+ * formato dos dados e duplicidade de placas.
+ */
 @Service
 public class CarroCsvService {
 
@@ -25,6 +29,13 @@ public class CarroCsvService {
 
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
+    /**
+     * Grava todos os carros cadastrados em um CSV UTF-8 com cabeçalho, escapando os campos de
+     * texto e protegendo o conteúdo contra fórmulas interpretadas por planilhas.
+     *
+     * @param caminhoArquivo caminho do arquivo CSV que será criado ou sobrescrito
+     * @throws IOException se não for possível criar ou escrever o arquivo
+     */
     public void exportarParaCsv(Path caminhoArquivo) throws IOException {
         List<Carro> carros = carroRepository.findAll();
 
@@ -46,6 +57,14 @@ public class CarroCsvService {
         }
     }
 
+    /**
+     * Importa carros de um CSV UTF-8 de até 5 MB, ignorando o cabeçalho, linhas inválidas e
+     * placas já cadastradas ou repetidas no próprio arquivo.
+     *
+     * @param caminhoArquivo caminho do arquivo CSV com os carros a importar
+     * @return quantidade de carros efetivamente persistidos
+     * @throws IOException se o arquivo exceder 5 MB ou não puder ser acessado e lido
+     */
     public int importarDeCsv(Path caminhoArquivo) throws IOException {
         // Limite de tamanho do arquivo
         long fileSize = Files.size(caminhoArquivo);

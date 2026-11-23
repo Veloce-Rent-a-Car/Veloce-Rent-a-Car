@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
+/**
+ * Entidade que representa um carro disponível para aluguel.
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -36,12 +39,27 @@ public class Carro {
     @Column(nullable = false)
     private StatusCarro statusDisponibilidade;
 
+    /**
+     * Situações de disponibilidade de um carro.
+     */
     public enum StatusCarro {
+        /** Carro disponível para aluguel. */
         DISPONIVEL,
+        /** Carro atualmente alugado. */
         ALUGADO,
+        /** Carro indisponível por estar em manutenção. */
         MANUTENCAO
     }
 
+    /**
+     * Cria um carro com seus dados principais.
+     *
+     * @param modelo modelo do carro
+     * @param placa placa única do carro
+     * @param categoria categoria do carro
+     * @param valorDaDiaria valor cobrado por diária
+     * @param status situação inicial de disponibilidade
+     */
     public Carro(String modelo, String placa, String categoria, BigDecimal valorDaDiaria, StatusCarro status) {
         this.modelo = modelo;
         this.placa = placa;

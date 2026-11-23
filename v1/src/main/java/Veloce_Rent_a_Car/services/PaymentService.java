@@ -18,6 +18,10 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Gerencia a consulta e o registro de pagamentos vinculados aos aluguéis, incluindo a
+ * publicação de evento quando um novo pagamento é aprovado.
+ */
 @Service
 public class PaymentService {
 
@@ -30,19 +34,48 @@ public class PaymentService {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
+    /**
+     * Recupera todos os pagamentos persistidos.
+     *
+     * @return lista com todos os pagamentos cadastrados
+     */
     public List<Payment> findAll() {
         return paymentRepository.findAll();
     }
 
+    /**
+     * Localiza um pagamento pelo seu identificador.
+     *
+     * @param id identificador do pagamento
+     * @return pagamento correspondente ao identificador
+     * @throws RecursoNaoEncontradoException se o pagamento não existir
+     */
     public Payment findById(Long id) {
         return paymentRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Pagamento nao encontrado com id: " + id));
     }
 
+    /**
+     * Recupera os pagamentos associados a um aluguel.
+     *
+     * @param rentId identificador do aluguel
+     * @return lista de pagamentos vinculados ao aluguel informado
+     */
     public List<Payment> findByRentId(Long rentId) {
         return paymentRepository.findByRentId(rentId);
     }
 
+    /**
+     * Registra um pagamento aprovado com a data atual, exigindo que o aluguel exista, ainda não
+     * tenha pagamento aprovado e receba exatamente o valor do aluguel. Após persistir, publica
+     * um {@link PaymentApprovedEvent} com o pagamento salvo.
+     *
+     * @param dto dados do aluguel, valor e método do pagamento
+     * @return pagamento persistido com status {@code APROVADO}
+     * @throws RecursoNaoEncontradoException se o aluguel informado não existir
+     * @throws RegraDeNegocioException se o aluguel já possuir pagamento aprovado
+     * @throws ValidacaoException se o valor for nulo ou diferente do valor do aluguel
+     */
     public Payment create(NewPaymentDTO dto) {
         RentModel rent = rentRepository.findById(dto.getRentId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Aluguel nao encontrado com id: " + dto.getRentId()));

@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * Entidade que representa o aluguel de um carro por um cliente.
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -42,11 +45,19 @@ public class RentModel {
     @Column(nullable = false)
     private RentStatus status;
 
+    /**
+     * Etapas do ciclo de vida de um aluguel.
+     */
     public enum RentStatus {
+        /** Aluguel aguardando confirmação. */
         PENDING,
+        /** Aluguel confirmado. */
         CONFIRMED,
+        /** Aluguel em andamento. */
         ACTIVE,
+        /** Aluguel concluído. */
         FINISHED,
+        /** Aluguel cancelado. */
         CANCELLED
     }
 }

@@ -4,6 +4,10 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 
+/**
+ * Transporta os dados usados para criar um aluguel: CPF do cliente, nome do carro,
+ * tipo ou modelo do carro e valor do aluguel.
+ */
 @Data
 public class NewRentDTO {
     private String clientCpf;
